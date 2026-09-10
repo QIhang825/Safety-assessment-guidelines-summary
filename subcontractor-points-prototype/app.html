@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>安全积分考核 · APP</title>
+<style>
+:root {
+  --primary:#268DFF;
+  --primary-hover:#1A7AE8;
+  --page:#F5F5F5;
+  --card:#FFFFFF;
+  --text:#333333;
+  --text2:#666666;
+  --text3:#999999;
+  --disabled:#BFBFBF;
+  --line:#E8E8E8;
+  --split:#D9D9D9;
+  --danger:#FA2A31;
+  --warn:#F77112;
+  --ok:#11BC11;
+  --safe:#21B874;
+  --font:"PingFang SC","Microsoft YaHei",sans-serif;
+  --num:Roboto,"DIN Alternate",Arial,sans-serif;
+  --nav-h:44px;
+  --tab-h:50px;
+  --status-h:44px;
+}
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; }
+body {
+  font-family:var(--font);
+  background:#111;
+  color:var(--text2);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+#phone {
+  width:375px;
+  height:812px;
+  background:var(--page);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+@media (max-width:430px) {
+  body { background:var(--page); align-items:stretch; }
+  #phone { width:100%; height:100dvh; box-shadow:none; }
+}
+.head { background:#fff; flex-shrink:0; position:relative; overflow:hidden; }
+.head-deco { display:none; position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.head-deco path { fill:none; stroke:rgba(255,255,255,.28); stroke-width:1; }
+.head.wb {
+  background:var(--primary);
+}
+.head.wb .head-deco { display:block; }
+.head.wb .statusbar,
+.head.wb .navbar { background:transparent; color:#fff; border-bottom:0; }
+.head.wb .statusbar .icons { color:#fff; }
+.head.wb .icon-btn { color:#fff; }
+.head.wb .navbar { padding:0 16px; }
+.head.wb .navbar .title { display:none; }
+.head.wb .navbar .side { width:auto; flex:1; min-width:0; }
+.head.wb .navbar .side.right { flex:0 0 auto; }
+.statusbar {
+  height:var(--status-h);
+  padding:12px 16px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff;
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  position:relative;
+  z-index:1;
+}
+.statusbar .icons { display:flex; gap:6px; align-items:center; color:var(--text); font-size:12px; }
+.navbar {
+  height:var(--nav-h);
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 12px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+  z-index:1;
+}
+.navbar .title { font-size:18px; font-weight:600; color:var(--text); }
+.navbar .side { width:64px; display:flex; align-items:center; }
+.navbar .side.right { justify-content:flex-end; gap:12px; }
+.icon-btn { width:24px; height:24px; border:0; background:transparent; color:var(--text); cursor:pointer; position:relative; }
+.icon-btn svg { width:22px; height:22px; display:block; }
+.nav-org {
+  max-width:100%; border:0; background:transparent; color:#fff; cursor:pointer;
+  display:flex; align-items:center; gap:4px; padding:0;
+  font-family:inherit; font-size:16px; font-weight:600; line-height:22px;
+}
+.nav-org span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.nav-org svg { width:16px; height:16px; flex-shrink:0; }
+.badge-dot {
+  position:absolute; top:-2px; right:-4px;
+  min-width:14px; height:14px; padding:0 4px;
+  background:var(--danger); color:#fff; border-radius:7px;
+  font-size:10px; line-height:14px; text-align:center;
+}
+.stage { flex:1; overflow:auto; position:relative; -webkit-overflow-scrolling:touch; }
+.view { display:none; min-height:100%; padding-bottom:12px; }
+.view.active { display:block; }
+.tabbar {
+  height:calc(var(--tab-h) + env(safe-area-inset-bottom, 0px));
+  padding:0 12px env(safe-area-inset-bottom, 0px);
+  background:#fff;
+  border-top:0.5px solid #E9E9E9;
+  display:flex;
+  align-items:flex-end;
+  gap:16px;
+  flex-shrink:0;
+}
+.tab {
+  flex:1; height:46px; margin-bottom:0; padding:4px 0 0;
+  border:0; background:transparent; color:#666;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:4px;
+  font-size:10px; line-height:12px; cursor:pointer; white-space:nowrap;
+}
+.tab.active { color:var(--primary); font-weight:600; }
+.tab svg { width:24px; height:24px; display:block; }
+.wb-card {
+  margin:12px; background:#fff; border-radius:6px; padding:12px;
+}
+.wb-title {
+  font-size:16px; font-weight:600; color:var(--text); line-height:22px; margin-bottom:10px;
+}
+.wb-row {
+  display:flex; justify-content:space-between; align-items:flex-start;
+}
+.wb-entry {
+  width:56px; padding:0; border:0; background:transparent; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  font-family:inherit; color:var(--text); position:relative;
+}
+.wb-ico {
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; color:#fff;
+}
+.wb-ico svg { width:18px; height:18px; display:block; }
+.wb-lab { font-size:14px; line-height:20px; color:var(--text); white-space:nowrap; }
+.wb-entry .n {
+  position:absolute; top:-4px; right:2px;
+  min-width:14px; height:14px; padding:0 4px;
+  background:var(--danger); color:#fff; border-radius:7px; font-size:10px; line-height:14px;
+}
+.dash-hint { margin:8px 16px 0; font-size:12px; color:var(--text3); }
+.stat-grid {
+  background:#fff; border-radius:8px;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  padding:12px 0 8px;
+}
+.stat-cell {
+  min-height:49px; padding:4px 4px 8px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  cursor:pointer; position:relative;
+}
+.stat-cell:not(:nth-child(4n)):not(:last-child)::after {
+  content:""; position:absolute; right:0; top:10px; bottom:10px; width:1px; background:var(--line);
+}
+.stat-val { display:flex; align-items:baseline; justify-content:center; gap:2px; }
+.stat-n { font-family:var(--num); font-size:20px; line-height:24px; font-weight:700; color:var(--primary); }
+.stat-n.warn { color:var(--warn); }
+.stat-n.danger { color:var(--danger); }
+.stat-l { font-size:12px; line-height:16px; color:var(--text2); text-align:center; }
+.stat-u { font-size:12px; line-height:16px; color:var(--text3); }
+.chart-card { margin:0 12px 12px; background:#fff; border-radius:8px; padding:12px 12px 8px; }
+.chart-head { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:24px; margin-bottom:8px; }
+.chart-title { font-size:16px; font-weight:600; color:var(--text); }
+.mini-sel { font-size:12px; color:var(--primary); display:flex; align-items:center; gap:2px; cursor:pointer; max-width:140px; }
+.mini-sel svg { width:12px; height:12px; flex-shrink:0; }
+.donut-wrap { display:flex; align-items:center; gap:12px; padding:4px 0 8px; }
+.donut-legend { flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
+.legend-swatch { width:8px; height:8px; border-radius:1px; flex-shrink:0; }
+.legend-val { margin-left:auto; font-family:var(--num); color:var(--text); }
+.line-chart { width:100%; height:168px; display:block; }
+.rank-item { display:flex; align-items:center; gap:10px; padding:10px 4px; border-top:1px solid var(--line); }
+.rank-item:first-child { border-top:0; }
+.rank-no {
+  width:20px; height:20px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:var(--text3); background:#F5F5F5;
+}
+.rank-no.gold { background:#FFD23F; color:#333; }
+.rank-no.silver { background:#D9D9D9; color:#333; }
+.rank-no.bronze { background:#E8C39E; color:#333; }
+.sec { margin:0 12px 12px; }
+.sec-h { font-size:16px; font-weight:600; color:var(--text); margin:4px 4px 8px; }
+.card { background:#fff; border-radius:8px; overflow:hidden; }
+.todo-item, .list-item, .menu-item, .log-item {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 16px; background:#fff; position:relative;
+}
+.list-item, .rank-item { cursor:pointer; }
+.todo-item + .todo-item, .list-item + .list-item, .menu-item + .menu-item, .log-item + .log-item { border-top:1px solid var(--line); }
+.avatar {
+  width:40px; height:40px; border-radius:8px;
+  background:linear-gradient(180deg,#8FC5FF,#268DFF);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:600; flex-shrink:0;
+}
+.avatar.sub { background:linear-gradient(180deg,#7BE0A8,#21B874); }
+.grow { flex:1; min-width:0; }
+.name { font-size:15px; font-weight:500; color:var(--text); }
+.sub { font-size:12px; color:var(--text3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.link { color:var(--primary); }
+.score { font-family:var(--num); font-size:16px; font-weight:700; color:var(--text); }
+.score.warn { color:var(--warn); }
+.score.danger { color:var(--danger); }
+.score.ok { color:var(--ok); }
+.tag {
+  display:inline-flex; align-items:center; gap:4px;
+  font-size:12px; padding:0 6px; height:20px; border-radius:2px;
+}
+.tag.ok { color:var(--ok); background:#E8F8E8; }
+.tag.warn { color:var(--warn); background:#FFF3E8; }
+.tag.danger { color:var(--danger); background:#FDECEC; }
+.tag.blue { color:var(--primary); background:#E8F3FF; }
+.dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+.btn {
+  height:30px; padding:0 12px; border-radius:4px; border:1px solid transparent;
+  font-size:14px; cursor:pointer; background:var(--primary); color:#fff;
+}
+.btn.ghost { background:#fff; color:var(--text2); border-color:var(--line); }
+.btn.block { width:100%; height:44px; font-size:16px; }
+.act-mini { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.act-mini .btn { height:24px; font-size:12px; }
+.grid4 { display:grid; grid-template-columns:1fr 1fr; }
+.grid-cell {
+  height:108px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+  cursor:pointer; border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+}
+.grid-cell:nth-child(2n) { border-right:0; }
+.grid-cell:nth-last-child(-n+2) { border-bottom:0; }
+.g-ico {
+  width:40px; height:40px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; color:#fff;
+}
+.g-ico svg { width:22px; height:22px; }
+.g-t { font-size:12px; font-weight:600; color:var(--text); }
+.g-d { font-size:12px; color:var(--text3); }
+.search-bar {
+  margin:12px; height:36px; background:#fff; border:1px solid var(--line); border-radius:4px;
+  display:flex; align-items:center; padding:0 10px; gap:8px;
+}
+.search-bar svg { width:16px; height:16px; color:var(--text3); flex-shrink:0; }
+.search-bar input { flex:1; border:0; outline:0; font-size:14px; background:transparent; color:var(--text); }
+.month-pick svg { width:16px; height:16px; color:var(--text3); }
+.chips { display:flex; gap:8px; padding:0 12px 8px; overflow-x:auto; }
+.chip {
+  height:28px; padding:0 12px; border-radius:14px; border:1px solid var(--line);
+  background:#fff; color:var(--text2); font-size:12px; white-space:nowrap; cursor:pointer;
+}
+.chip.on { background:#E8F3FF; border-color:var(--primary); color:var(--primary); }
+.seg {
+  margin:12px; height:36px; background:#F0F0F0; border-radius:6px; padding:2px;
+  display:flex;
+}
+.seg b {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:500; color:var(--text2); border-radius:4px; cursor:pointer;
+}
+.seg b.on { background:#fff; color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+.media-row { display:flex; gap:12px; padding:12px 16px; background:#fff; }
+.media-item { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.arch-photo {
+  width:56px; height:70px; border:1px solid var(--line); border-radius:4px;
+  background:linear-gradient(180deg,#E8F3FF,#F5F8FC);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--primary); font-size:18px; font-weight:700;
+}
+.arch-idcard {
+  width:88px; height:56px; border:1px solid var(--line); border-radius:4px; background:#F7F7F7;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text3); font-size:11px; text-align:center; padding:4px;
+}
+.media-cap { font-size:12px; color:var(--text3); }
+.arch-sign { height:28px; min-width:72px; display:inline-block; vertical-align:middle; }
+.kv.wide .k { width:128px; white-space:normal; line-height:20px; }
+.sec-h .more { margin-left:8px; font-size:12px; font-weight:500; color:var(--primary); }
+.empty { padding:48px 16px; text-align:center; color:var(--text3); font-size:14px; }
+.sheet {
+  position:absolute; inset:0; background:rgba(0,0,0,.45);
+  display:none; align-items:flex-end; z-index:20;
+}
+.sheet.show { display:flex; }
+.sheet .box { width:100%; background:#fff; border-radius:12px 12px 0 0; padding:8px 0 calc(12px + env(safe-area-inset-bottom,0px)); }
+.sheet .handle { width:36px; height:4px; background:#ddd; border-radius:2px; margin:6px auto 8px; }
+.sheet .opt { min-height:48px; padding:10px 16px; display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--text); cursor:pointer; text-align:center; }
+.sheet .opt + .opt { border-top:1px solid var(--line); }
+.sheet .opt.on { color:var(--primary); }
+.sheet .cancel { color:var(--text3); margin-top:8px; border-top:8px solid var(--page); }
+.toast {
+  position:absolute; left:50%; bottom:96px; transform:translateX(-50%) translateY(12px);
+  background:rgba(0,0,0,.78); color:#fff; padding:8px 16px; border-radius:6px;
+  font-size:13px; opacity:0; pointer-events:none; transition:.2s; z-index:30; white-space:nowrap;
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.detail-head { background:#fff; padding:16px; display:flex; gap:12px; align-items:center; }
+.kv { background:#fff; }
+.kv .row { display:flex; padding:12px 16px; font-size:14px; border-top:1px solid var(--line); }
+.kv .k { width:96px; color:var(--text3); flex-shrink:0; }
+.kv .v { flex:1; color:var(--text); }
+.num-in {
+  width:96px; height:32px; border:1px solid var(--line); border-radius:4px;
+  padding:0 8px; font-size:16px; font-family:var(--num); color:var(--text); background:#fff;
+}
+.num-in:disabled { background:#F5F5F5; color:var(--disabled); }
+.foot {
+  position:sticky; bottom:0; background:#fff; padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--line); display:flex; gap:8px;
+}
+.foot .btn { flex:1; min-width:0; height:44px; font-size:16px; }
+.actbar {
+  display:none; flex-shrink:0; background:#fff;
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--line);
+  flex-wrap:wrap; gap:8px;
+}
+.actbar.show { display:flex; }
+.actbar .btn { flex:1; min-width:0; height:44px; font-size:16px; }
+.actbar .btn.wide { flex:1 0 100%; }
+.btn.danger { background:#fff; color:var(--danger); border-color:var(--danger); }
+.sheet .msg { padding:4px 24px 12px; font-size:14px; line-height:22px; color:var(--text2); text-align:center; }
+.sheet .msg b { color:var(--text); }
+.log-item .when { font-size:12px; color:var(--text3); width:78px; flex-shrink:0; }
+.hint { margin:0 12px 8px; font-size:12px; color:var(--text3); }
+.month-pick {
+  margin:12px; height:36px; background:#fff; border:1px solid var(--line); border-radius:4px;
+  display:flex; align-items:center; justify-content:space-between; padding:0 12px; font-size:14px; color:var(--text);
+}
+</style>
+</head>
+<body>
+<div id="phone">
+  <div class="head" id="head">
+    <svg class="head-deco" viewBox="0 0 375 88" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-40 92 L188 -18 L400 92"/>
+      <path d="M-70 40 L160 100 L360 -10"/>
+      <path d="M40 100 L240 -22 L460 70"/>
+    </svg>
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="icons">5G · 100%</span>
+    </div>
+    <div class="navbar">
+      <div class="side" id="navLeft"></div>
+      <div class="title" id="navTitle">安全积分考核</div>
+      <div class="side right" id="navRight"></div>
+    </div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="actbar" id="actbar"></div>
+  <div class="tabbar" id="tabbar"></div>
+  <div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"></div>
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+const CURRENT_PROJECT = "雄忻高铁 3 标";
+const rules = { warn:90, learn:85, train:80, out:70, plus:10, days:7 };
+let role = "project";
+let stack = ["home"];
+let ptsTab = "people";
+let blTab = "p";
+let snapTab = "s";
+let snapMonth = "2026-07";
+let snapQ = "";
+let snapJob = "all";
+let snapProj = "all";
+let qPeople = "";
+let qSub = "";
+let qBl = "";
+let blpTab = "flow";
+let blpEduTab = "info";
+let blsTab = "flow";
+let subDetailTab = "base";
+let subInfoMore = true;
+let archiveTab = "info";
+let detailFrom = "points";
+let stFilter = "all";
+let dashProject = "all";
+let lineProject = "all";
+let kpiKind = "sub";
+let kpiProj = "all";
+let kpiQ = "";
+let kpiSt = "all";
+let kpiBlKind = "all";
+const isCompany = () => role === "company";
+const evalClauses = [
+  {id:"S15-3", name:"第十五条 · 无证特种作业", score:10},
+  {id:"S16-2", name:"第十六条 · 隐患未按期整改", score:5},
+  {id:"GRAY-1", name:"灰牌参照 · 未正确佩戴劳保", score:1},
+  {id:"YEL-8", name:"黄牌参照 · 危大作业未审批", score:5},
+  {id:"RED-6", name:"红牌参照 · 营业线侵限", score:10}
+];
+const subBLRules = [
+  {id:"S14-1", rule:"第十四条", name:"第十四条 · 伪造资质或安全资料"},
+  {id:"S14-2", rule:"第十四条", name:"第十四条 · 发生一般及以上生产安全事故"},
+  {id:"score", rule:"累计分过低", name:"累计分过低，直接列入"}
+];
+const today = () => new Date().toISOString().slice(0,10);
+
+let subs = [
+  {id:"s1", name:"保定冀铁劳务有限公司", lead:"曹卫东", score:86, status:"正常", inAt:"2026-03-01",
+    projects:{"雄忻高铁 3 标":86,"太焦接触网":78,"京唐站改":90},
+    logs:[{t:"2026-03-01", d:"领导小组批准进场，赋分 100"}],
+    links:[{t:"2026-08-12", d:"马连成 违规记分联动 0.1"}]},
+  {id:"s2", name:"石家庄线桥劳务公司", lead:"田立军", score:93, status:"正常", inAt:"2026-04-12",
+    projects:{"雄忻高铁 3 标":93},
+    logs:[{t:"2026-04-12", d:"领导小组批准进场，赋分 100"}],
+    links:[{t:"2026-08-18", d:"孙志强 违规记分联动 0.1"}]},
+  {id:"s3", name:"太原接触网劳务队", lead:"郭建华", score:71, status:"黑名单", inAt:"2026-02-18",
+    projects:{"雄忻高铁 3 标":71,"大西高铁":68},
+    logs:[{t:"2026-08-22", d:"第十四条 · 伪造资质，列入分包商黑名单"},{t:"2026-02-18", d:"领导小组批准进场，赋分 100"}],
+    links:[{t:"2026-08-21", d:"韩文斌 进入黑名单联动 1.0"}]}
+];
+let people = [
+  {id:"p1", name:"周建国", sub:"s1", job:"接触网工", project:"雄忻高铁 3 标", score:92, trainCount:0, inAt:"2026-03-12", logs:[{t:"2026-03-12", d:"三级教育合格，赋分 100"}]},
+  {id:"p2", name:"马连成", sub:"s1", job:"起重司索", project:"雄忻高铁 3 标", score:87, trainCount:0, inAt:"2026-03-20", logs:[{t:"2026-09-01", d:"未按规定佩戴防护，扣 5 分"},{t:"2026-08-12", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p3", name:"孙志强", sub:"s2", job:"电工", project:"雄忻高铁 3 标", score:83, trainCount:0, inAt:"2026-04-15", logs:[{t:"2026-09-02", d:"酒后上岗，扣 8 分"},{t:"2026-08-18", d:"酒后上岗，扣 8 分"}]},
+  {id:"p4", name:"刘海波", sub:"s3", job:"普工", project:"雄忻高铁 3 标", score:76, trainCount:1, inAt:"2026-05-02", logs:[{t:"2026-08-20", d:"无计划上道，扣 10 分"}]},
+  {id:"p5", name:"韩文斌", sub:"s3", job:"防护员", project:"雄忻高铁 3 标", score:68, trainCount:2, inAt:"2026-05-08", logs:[{t:"2026-08-21", d:"按规则列入人员黑名单：累计分低于清退线。无计划上道后累计 68 分，低于清退线 70 分；第二次停工培训"},{t:"2026-08-21", d:"无计划上道，扣 10 分，低于 70 分待清退"},{t:"2026-05-08", d:"三级教育合格，赋分 100"}]},
+  {id:"p6", name:"赵德福", sub:"s2", job:"焊工", project:"雄忻高铁 3 标", score:95, trainCount:0, inAt:"2026-03-05", logs:[{t:"2026-03-05", d:"三级教育合格，赋分 100"}]},
+  {id:"p7", name:"钱立新", sub:"s1", job:"架子工", project:"雄忻高铁 3 标", score:91, trainCount:0, inAt:"2026-03-18", logs:[{t:"2026-03-18", d:"三级教育合格，赋分 100"}]},
+  {id:"p8", name:"吴海涛", sub:"s2", job:"钢筋工", project:"雄忻高铁 3 标", score:88, trainCount:0, inAt:"2026-04-08", logs:[{t:"2026-07-22", d:"临电私拉乱接，扣 2 分"}]},
+  {id:"p9", name:"郑国强", sub:"s1", job:"混凝土工", project:"雄忻高铁 3 标", score:84, trainCount:0, inAt:"2026-04-22", logs:[{t:"2026-06-15", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p10", name:"冯志远", sub:"s3", job:"普工", project:"雄忻高铁 3 标", score:79, trainCount:1, inAt:"2026-05-16", logs:[{t:"2026-09-01", d:"酒后上岗，扣 8 分"},{t:"2026-08-08", d:"酒后上岗，扣 8 分"}]},
+  {id:"p11", name:"李建军", sub:"s1", job:"接触网工", project:"太焦接触网", score:78, trainCount:1, inAt:"2026-04-02", logs:[{t:"2026-09-02", d:"临电私拉乱接，扣 2 分"},{t:"2026-08-06", d:"临电私拉乱接，扣 2 分"}]},
+  {id:"p12", name:"王志刚", sub:"s1", job:"焊工", project:"京唐站改", score:90, trainCount:0, inAt:"2026-03-22", logs:[{t:"2026-03-22", d:"三级教育合格，赋分 100"}]},
+  {id:"p13", name:"陈福生", sub:"s3", job:"防护员", project:"大西高铁", score:72, trainCount:1, inAt:"2026-05-10", logs:[{t:"2026-08-11", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p14", name:"杨晓东", sub:"s3", job:"普工", project:"大西高铁", score:65, trainCount:2, inAt:"2026-05-20", logs:[{t:"2026-08-14", d:"按规则列入人员黑名单：累计分低于清退线。无计划上道后累计 65 分，低于清退线 70 分；第二次停工培训"},{t:"2026-08-14", d:"无计划上道，扣 10 分，低于 70 分待清退"},{t:"2026-05-20", d:"三级教育合格，赋分 100"}]},
+  {id:"p15", name:"徐海龙", sub:"s1", job:"架子工", project:"太焦接触网", score:88, trainCount:0, inAt:"2026-04-18", logs:[{t:"2026-07-09", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p16", name:"高明", sub:"s1", job:"电工", project:"京唐站改", score:83, trainCount:0, inAt:"2026-04-25", logs:[{t:"2026-08-16", d:"酒后上岗，扣 8 分"}]}
+];
+const vioHistory = {"2026-04":8,"2026-05":11,"2026-06":9,"2026-07":12,"2026-08":7};
+const vioHistoryCo = {"2026-04":18,"2026-05":21,"2026-06":16,"2026-07":22,"2026-08":14};
+const vioHistoryByProject = {
+  "雄忻高铁 3 标":{"2026-04":10,"2026-05":12,"2026-06":8,"2026-07":11,"2026-08":6},
+  "太焦接触网":{"2026-04":3,"2026-05":4,"2026-06":3,"2026-07":5,"2026-08":4},
+  "京唐站改":{"2026-04":3,"2026-05":3,"2026-06":3,"2026-07":4,"2026-08":3},
+  "大西高铁":{"2026-04":2,"2026-05":2,"2026-06":2,"2026-07":2,"2026-08":1}
+};
+let trainConfirms = [
+  {id:"c1", pid:"p4", course:"停工再教育 · 营业线作业纪律", hours:8, exam:86, doneAt:"2026-08-24", plus:10, status:"待确认"}
+];
+let personBL = [
+  {id:"pb1", pid:"p5", name:"韩文斌", job:"防护员", project:"雄忻高铁 3 标", sub:"s3", rule:"累计分低于清退线", reason:"无计划上道后累计 68 分", time:"2026-08-21", removed:false},
+  {id:"pb2", pid:"p14", name:"杨晓东", job:"普工", project:"大西高铁", sub:"s3", rule:"累计分低于清退线", reason:"无计划上道后累计 65 分", time:"2026-08-14", removed:false}
+];
+let subBL = [
+  {id:"sb1", sid:"s3", name:"太原接触网劳务队", rule:"第十四条", reason:"伪造资质或安全资料", time:"2026-08-22", removed:false, project:"雄忻高铁 3 标"}
+];
+const snaps = {
+  "2026-06": {
+    subs:[{n:"保定冀铁劳务有限公司",s:92,st:"正常"},{n:"石家庄线桥劳务公司",s:96,st:"正常"},{n:"太原接触网劳务队",s:84,st:"正常"}],
+    people:[{n:"赵德福",s:98,st:"正常"},{n:"周建国",s:96,st:"正常"},{n:"钱立新",s:98,st:"正常"},{n:"马连成",s:95,st:"正常"},{n:"孙志强",s:94,st:"正常"},{n:"吴海涛",s:98,st:"正常"},{n:"郑国强",s:95,st:"正常"},{n:"刘海波",s:92,st:"正常"},{n:"韩文斌",s:90,st:"正常"},{n:"冯志远",s:93,st:"正常"},{n:"李建军",s:90,st:"正常"},{n:"徐海龙",s:96,st:"正常"},{n:"高明",s:94,st:"正常"},{n:"王志刚",s:98,st:"正常"},{n:"陈福生",s:92,st:"正常"},{n:"杨晓东",s:88,st:"重点管控"}]
+  },
+  "2026-07": {
+    subs:[{n:"保定冀铁劳务有限公司",s:90,st:"正常"},{n:"石家庄线桥劳务公司",s:94,st:"正常"},{n:"太原接触网劳务队",s:78,st:"正常"}],
+    people:[{n:"赵德福",s:95,st:"正常"},{n:"周建国",s:92,st:"正常"},{n:"钱立新",s:91,st:"正常"},{n:"马连成",s:92,st:"正常"},{n:"孙志强",s:91,st:"正常"},{n:"吴海涛",s:88,st:"重点管控"},{n:"郑国强",s:84,st:"重点管控"},{n:"刘海波",s:86,st:"重点管控"},{n:"韩文斌",s:78,st:"停工培训"},{n:"冯志远",s:87,st:"重点管控"},{n:"李建军",s:80,st:"重点管控"},{n:"徐海龙",s:88,st:"重点管控"},{n:"高明",s:91,st:"正常"},{n:"王志刚",s:90,st:"正常"},{n:"陈福生",s:77,st:"停工培训"},{n:"杨晓东",s:75,st:"停工培训"}]
+  }
+};
+const edu = {
+  p4:{ certs:["特种作业（高处） 有效期至 2027-03"], trains:["三级教育 2026-05-02","停工再教育 2026-08-24 86 分"] },
+  p5:{ certs:["防护员证 有效期至 2026-12"], trains:["三级教育 2026-05-08","停工再教育二次"] },
+  p14:{ certs:["特种作业证待核验"], trains:["三级教育 2026-05-20","停工再教育二次"] }
+};
+
+const $ = (s, el=document) => el.querySelector(s);
+const toast = (m) => { const t=$("#toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 2200); };
+const subName = id => (subs.find(s=>s.id===id)||{}).name || "-";
+const inPBL = p => personBL.some(x=>!x.removed && x.pid===p.id);
+const inSBL = s => subBL.some(x=>!x.removed && x.sid===s.id);
+function pStatus(p){
+  if (inPBL(p)) return ["清退/黑名单","danger"];
+  if (p.score < rules.train) return ["停工培训","danger"];
+  if (p.score < rules.warn) return ["重点管控","warn"];
+  return ["正常","ok"];
+}
+function sStatus(s){ return (inSBL(s)||s.status==="黑名单") ? ["黑名单","danger"] : ["正常","ok"]; }
+function visPeople(){ return people.filter(p => isCompany() || p.project===CURRENT_PROJECT); }
+function visSubs(){ return subs.filter(s => isCompany() || CURRENT_PROJECT in (s.projects||{})); }
+function pendingTrain(){ return trainConfirms.filter(c => c.status==="待确认" && visPeople().some(p=>p.id===c.pid)); }
+function todoN(){
+  if (isCompany()) return 1;
+  return pendingTrain().length;
+}
+function allProjects(){
+  const set=new Set();
+  subs.forEach(s=>Object.keys(s.projects||{}).forEach(k=>set.add(k)));
+  people.forEach(p=>{ if(p.project) set.add(p.project); });
+  return [...set];
+}
+function livePeopleList(project){
+  return people.filter(p=>{
+    if (project && project!=="all") return p.project===project;
+    return isCompany() || p.project===CURRENT_PROJECT;
+  });
+}
+function liveSubList(){ return subs.slice(); }
+function subProjectRows(project){
+  const rows=[];
+  liveSubList().forEach(s=>{
+    Object.entries(s.projects||{}).forEach(([proj,score])=>{
+      if (project && project!=="all" && proj!==project) return;
+      if (!isCompany() && proj!==CURRENT_PROJECT) return;
+      rows.push({s, project:proj, score});
+    });
+  });
+  return rows;
+}
+function monthKeyNow(){ return today().slice(0,7); }
+function last6MonthKeys(){
+  const now=new Date();
+  const out=[];
+  for(let i=5;i>=0;i--){
+    const x=new Date(now.getFullYear(), now.getMonth()-i, 1);
+    out.push({key:`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}`, label:`${x.getMonth()+1}月`});
+  }
+  return out;
+}
+function monthVioPeople(key, project){
+  const k=(key||today()).slice(0,7);
+  return livePeopleList(project).filter(p=>(p.logs||[]).some(l=>(l.t||"").slice(0,7)===k && /扣/.test(l.d)));
+}
+function monthVioCount(key, project){
+  const k=(key||today()).slice(0,7);
+  const live=monthVioPeople(k, project).length;
+  if (k===monthKeyNow()) return live;
+  if (project && project!=="all"){
+    const ph=vioHistoryByProject[project];
+    return ph && ph[k]!=null ? ph[k] : live;
+  }
+  const hist=isCompany()?vioHistoryCo:vioHistory;
+  return hist[k]!=null ? hist[k] : live;
+}
+function trainPeopleList(project){ return livePeopleList(project).filter(p=>pStatus(p)[0]==="停工培训"); }
+function blPeopleList(project){ return livePeopleList(project).filter(p=>inPBL(p)); }
+function blSubList(project){
+  return liveSubList().filter(s=>{
+    if (!inSBL(s) && s.status!=="黑名单") return false;
+    if (isCompany()){
+      if (project && project!=="all") return s.projects && s.projects[project]!=null;
+      return true;
+    }
+    return !s.projects || s.projects[CURRENT_PROJECT]!=null;
+  });
+}
+function projLabel(v){ return !v || v==="all" ? "全部项目" : v; }
+function ic(name){
+  const p = 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  const m = {
+    back:`<svg viewBox="0 0 24 24"><path ${p} d="M15 6l-6 6 6 6"/></svg>`,
+    bell:`<svg viewBox="0 0 24 24"><path ${p} d="M6 9a6 6 0 1112 0c0 7 3 7 3 9H3c0-2 3-2 3-9"/><path ${p} d="M10 21h4"/></svg>`,
+    org:`<svg viewBox="0 0 24 24"><path ${p} d="M12 3v6M6 21V9h12v12M9 13h.01M15 13h.01M9 17h.01M15 17h.01"/></svg>`,
+    chev:`<svg viewBox="0 0 24 24" width="16" height="16"><path ${p} d="M9 6l6 6-6 6"/></svg>`,
+    down:`<svg viewBox="0 0 24 24"><path ${p} d="M6 9l6 6 6-6"/></svg>`,
+    home:`<svg viewBox="0 0 24 24"><path ${p} d="M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-5v-6H10v6H5a1 1 0 01-1-1z"/></svg>`,
+    chart:`<svg viewBox="0 0 24 24"><path ${p} d="M4 19V5M4 19h16"/><path ${p} d="M8 15v-4M12 15V8M16 15v-7"/></svg>`,
+    msg:`<svg viewBox="0 0 24 24"><path ${p} d="M5 6h14v10H8l-3 3V6z"/></svg>`,
+    more:`<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="18" cy="12" r="1.4" fill="currentColor"/></svg>`,
+    search:`<svg viewBox="0 0 24 24"><circle fill="none" stroke="currentColor" stroke-width="1.8" cx="11" cy="11" r="6"/><path ${p} d="M16 16l4 4"/></svg>`,
+    user:`<svg viewBox="0 0 24 24"><circle ${p.replace('fill="none" ','')} cx="12" cy="8" r="3.2"/><path ${p} d="M5 19c1.6-3 4-4.5 7-4.5S17.4 16 19 19"/></svg>`,
+    tabTask:`<svg viewBox="0 0 24 24"><rect x="6.5" y="5.5" width="11" height="14" rx="1.6" ${p}/><path ${p} d="M9 4.5h6v2H9z"/><path ${p} d="M9.2 12.2l2.1 2.1 3.6-3.8"/></svg>`,
+    tabWb:`<svg viewBox="0 0 24 24"><rect x="3.2" y="3.2" width="7.4" height="7.4" rx="1.2" fill="currentColor"/><rect x="3.2" y="13.4" width="7.4" height="7.4" rx="1.2" fill="currentColor"/><rect x="13.4" y="13.4" width="7.4" height="7.4" rx="1.2" fill="currentColor"/><rect x="13.4" y="3.2" width="7.4" height="7.4" rx="1.2" fill="currentColor" transform="rotate(45 17.1 6.9)"/></svg>`,
+    tabCam:`<svg viewBox="0 0 24 24"><path ${p} d="M4 9h3.2l1.3-2.2h7l1.3 2.2H20v9.2H4z"/><circle cx="12" cy="13.4" r="3.1" ${p}/></svg>`,
+    tabStat:`<svg viewBox="0 0 24 24"><path ${p} d="M5 19V5"/><path ${p} d="M5 19h14"/><path ${p} d="M9 15v-4M13 15V8M17 15v-6"/></svg>`,
+    tabDoc:`<svg viewBox="0 0 24 24"><rect x="6.5" y="5" width="11" height="15" rx="1.5" ${p}/><path ${p} d="M9 3.8h6v2.4H9z"/><path ${p} d="M9.5 11h5M9.5 14.2h5"/></svg>`
+  };
+  return m[name] || "";
+}
+
+function go(id, push=true){
+  if (push) stack.push(id);
+  else stack = [id];
+  if (id==="points" && isCompany()) ptsTab = "subs";
+  render();
+}
+function back(){
+  if (stack.length>1) stack.pop();
+  render();
+}
+function switchTab(id){
+  stack = [id];
+  render();
+}
+const TAB_ROOTS = ["task","home","shot","stats","proj"];
+function isTabRoot(id){ return TAB_ROOTS.includes(id); }
+function closeSheet(){ $("#sheet").classList.remove("show"); $("#sheet").innerHTML=""; }
+function openSheet(html){ $("#sheet").innerHTML = html; $("#sheet").classList.add("show"); }
+function roleLabel(){ return isCompany() ? "工程公司安监" : "项目安全员"; }
+function orgLabel(){ return isCompany() ? "工程公司 · 全部项目" : "项目安全员 · " + CURRENT_PROJECT; }
+
+function tagHtml(st, cls){ return `<span class="tag ${cls}"><i class="dot"></i>${st}</span>`; }
+function scoreCls(s){ return s<rules.train?"danger":s<rules.warn?"warn":"ok"; }
+
+function renderNav(){
+  const page = stack[stack.length-1];
+  const titles = {
+    task:"任务", shot:"随手拍", stats:"数据统计", proj:"项目信息",
+    dash:"数据看板", points:"积分管理", todo: isCompany()?"待阅事项":"停工培训确认",
+    files:"档案", person: detailFrom==="bl"?"人员黑名单":"人员详情", archive:"人员详情",
+    sub: detailFrom==="bl"?"分包商黑名单":"分包商详情", subinfo:"分包商详情", train:"培训确认",
+    bl:"黑名单库", blp: detailFrom==="bl"?"人员黑名单":"人员详情", bls: detailFrom==="bl"?"分包商黑名单":"分包商详情", month:"月度考核", kpi:"下穿详情"
+  };
+  const home = page==="home";
+  const root = isTabRoot(page);
+  $("#head").classList.toggle("wb", home);
+  $("#navTitle").textContent = home ? "" : (titles[page] || "");
+  $("#navLeft").innerHTML = home
+    ? `<button type="button" class="nav-org" onclick="pickRole()"><span>${orgLabel()}</span>${ic("down")}</button>`
+    : (root ? "" : `<button class="icon-btn" onclick="back()">${ic("back")}</button>`);
+  $("#navRight").innerHTML = home
+    ? `<button class="icon-btn" onclick="go('todo')">${ic("bell")}${todoN()?`<span class="badge-dot">${todoN()}</span>`:""}</button>`
+    : "";
+  $("#tabbar").style.display = root ? "flex" : "none";
+  $("#tabbar").innerHTML = [
+    ["task","任务","tabTask"],
+    ["home","工作台","tabWb"],
+    ["shot","随手拍","tabCam"],
+    ["stats","数据统计","tabStat"],
+    ["proj","项目信息","tabDoc"]
+  ].map(([id,lab,ico]) => `<button type="button" class="tab ${page===id?"active":""}" onclick="switchTab('${id}')">${ic(ico)}${lab}</button>`).join("");
+}
+
+function renderHome(){
+  const n=todoN();
+  return `<div class="wb-card">
+      <div class="wb-title">安全积分</div>
+      <div class="wb-row">
+        <button type="button" class="wb-entry" onclick="go('dash')">
+          <span class="wb-ico" style="background:linear-gradient(180deg,#5FABFF 6%,#268DFF 100%)">${ic("home")}</span>
+          <span class="wb-lab">数据看板</span>
+        </button>
+        <button type="button" class="wb-entry" onclick="go('points')">
+          <span class="wb-ico" style="background:linear-gradient(180deg,#48EA91 0%,#1AB35F 100%)">${ic("chart")}</span>
+          <span class="wb-lab">积分</span>
+        </button>
+        <button type="button" class="wb-entry" onclick="go('todo')">
+          <span class="wb-ico" style="background:linear-gradient(180deg,#F58F48 0%,#E76E30 100%)">${ic("msg")}</span>
+          <span class="wb-lab">待办</span>
+          ${n?`<span class="n">${n}</span>`:""}
+        </button>
+        <button type="button" class="wb-entry" onclick="go('files')">
+          <span class="wb-ico" style="background:linear-gradient(180deg,#9081FD 0%,#5B4CC8 100%)">${ic("more")}</span>
+          <span class="wb-lab">档案</span>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderDash(){
+  const company=isCompany();
+  const livePeople=livePeopleList();
+  const thisKey=monthKeyNow();
+  const subN=company?liveSubList().length:subProjectRows(CURRENT_PROJECT).length;
+  const kpis = (company
+    ? [
+        ["proj", allProjects().length, "在建项目", "个", ""],
+        ["sub", subN, "在场分包商", "家", ""],
+        ["people", livePeople.length, "在场人员", "人", ""],
+        ["vio", monthVioCount(thisKey), "月度违章", "人", "warn"],
+        ["train", trainPeopleList().length, "停工培训", "人", "warn"],
+        ["bl", blPeopleList().length+blSubList().length, "黑名单对象", "个", "danger"]
+      ]
+    : [
+        ["sub", subN, "在场分包商", "家", ""],
+        ["people", livePeople.length, "在场人员", "人", ""],
+        ["vio", monthVioCount(thisKey), "月度违章", "人", "warn"],
+        ["train", trainPeopleList().length, "停工培训", "人", "warn"],
+        ["bl", blPeopleList().length+blSubList().length, "黑名单对象", "个", "danger"]
+      ]
+  );
+  const donutPeople=livePeopleList(company?dashProject:undefined);
+  const dist=[
+    {label:"≥90 正常", value:donutPeople.filter(p=>p.score>=90).length, color:"#11BC11"},
+    {label:"85–89", value:donutPeople.filter(p=>p.score>=85&&p.score<90).length, color:"#268DFF"},
+    {label:"80–84", value:donutPeople.filter(p=>p.score>=80&&p.score<85).length, color:"#F77112"},
+    {label:"70–79 停工", value:donutPeople.filter(p=>p.score>=70&&p.score<80).length, color:"#FA541C"},
+    {label:"<70 清退", value:donutPeople.filter(p=>p.score<70).length, color:"#FF4141"}
+  ];
+  const lineSeries=last6MonthKeys().map(m=>({label:m.label, n:monthVioCount(m.key, company?lineProject:undefined)}));
+  const personRank=company?[]:livePeople.slice().sort((a,b)=>b.score-a.score).slice(0,10);
+  const subRank=company
+    ? subProjectRows("all").slice().sort((a,b)=>b.score-a.score)
+    : subProjectRows(CURRENT_PROJECT).slice().sort((a,b)=>b.score-a.score);
+  return `<p class="dash-hint">${company?"F8.2 公司看板：跨项目汇总，不含人员实时预警名单":"F8.1 项目看板：人员预警仅项目可见"}</p>
+    <div class="sec">
+      <div class="sec-h">指标概览</div>
+      <div class="stat-grid">${kpis.map((item)=>{
+      const [k,n,l,u,cls]=item;
+      const ncls=cls==="warn"?"warn":cls==="danger"?"danger":"";
+      return `<div class="stat-cell" onclick="openKpi('${k}')"><div class="stat-val"><span class="stat-n ${ncls}">${n}</span><span class="stat-u">${u}</span></div><div class="stat-l">${l}</div></div>`;
+    }).join("")}</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">人员分值分布</div>
+        ${company?`<div class="mini-sel" onclick="pickChartProj('donut')">${projLabel(dashProject)}${ic("chev")}</div>`:""}
+      </div>
+      ${donutHtml(dist)}
+    </div>
+    <div class="chart-card">
+      <div class="chart-head">
+        <div class="chart-title">违规人数月度折线</div>
+        ${company?`<div class="mini-sel" onclick="pickChartProj('line')">${projLabel(lineProject)}${ic("chev")}</div>`:""}
+      </div>
+      ${lineHtml(lineSeries)}
+    </div>
+    ${company?"":`<div class="chart-card">
+      <div class="chart-head"><div class="chart-title">TOP10 人员积分排名</div></div>
+      ${personRank.map((p,i)=>{
+        const rcls=i===0?"gold":i===1?"silver":i===2?"bronze":"";
+        return `<div class="rank-item" onclick="openPerson('${p.id}','dash')">
+          <div class="rank-no ${rcls}">${i+1}</div>
+          <div class="grow"><div class="name">${p.name}</div><div class="sub">${p.job} · ${subName(p.sub)}</div></div>
+          <div class="score ${scoreCls(p.score)}">${p.score}</div>
+        </div>`;
+      }).join("") || `<div class="empty">暂无在场人员</div>`}
+    </div>`}
+    <div class="chart-card">
+      <div class="chart-head"><div class="chart-title">分包商积分排名</div></div>
+      ${subRank.map((r,i)=>{
+        const s=r.s, sc=r.score, [st,cls]=sStatus(s);
+        const rcls=i===0?"gold":i===1?"silver":i===2?"bronze":"";
+        const n=people.filter(p=>p.sub===s.id && p.project===r.project).length;
+        return `<div class="rank-item" onclick="openSub('${s.id}','dash')">
+          <div class="rank-no ${rcls}">${i+1}</div>
+          <div class="grow"><div class="name">${s.name}</div><div class="sub">${company?r.project+" · ":""}${s.lead} · ${n} 人</div></div>
+          <div style="text-align:right"><div class="score ${scoreCls(sc)}">${sc}</div>${tagHtml(st,cls)}</div>
+        </div>`;
+      }).join("") || `<div class="empty">暂无在场分包商</div>`}
+    </div>`;
+}
+function donutHtml(segs){
+  const total=segs.reduce((a,s)=>a+s.value,0);
+  const r=42, circ=2*Math.PI*r, cx=60, cy=60;
+  let off=0;
+  const rings=segs.filter(s=>s.value>0).map(s=>{
+    const len=total?(s.value/total)*circ:0;
+    const node=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="16" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"></circle>`;
+    off+=len;
+    return node;
+  }).join("");
+  return `<div class="donut-wrap">
+    <svg width="120" height="120" viewBox="0 0 120 120">
+      ${rings || `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E8E8E8" stroke-width="16"></circle>`}
+      <circle cx="${cx}" cy="${cy}" r="30" fill="#fff"></circle>
+      <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="18" font-weight="700" fill="#333" font-family="Roboto,Arial">${total}</text>
+      <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="10" fill="#999">在场人员</text>
+    </svg>
+    <div class="donut-legend">${segs.map(s=>`<div class="legend-item"><i class="legend-swatch" style="background:${s.color}"></i><span>${s.label}</span><span class="legend-val">${s.value}</span></div>`).join("")}</div>
+  </div>`;
+}
+function lineHtml(series){
+  const w=327, h=168, pl=28, pr=8, pt=18, pb=28;
+  const iw=w-pl-pr, ih=h-pt-pb;
+  const max=Math.max(4, ...series.map(s=>s.n));
+  const step=Math.ceil(max/4)||1;
+  const yMax=step*4;
+  const xAt=i=>pl+(series.length<=1?iw/2:i*iw/(series.length-1));
+  const yAt=v=>pt+ih-(v/yMax)*ih;
+  const pts=series.map((s,i)=>`${xAt(i).toFixed(1)},${yAt(s.n).toFixed(1)}`).join(" ");
+  const grid=[0,1,2,3,4].map(i=>{
+    const y=yAt(i*step);
+    return `<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#E8E8E8"/><text x="${pl-4}" y="${y+4}" text-anchor="end" font-size="10" fill="#999">${i*step}</text>`;
+  }).join("");
+  const labels=series.map((s,i)=>`<text x="${xAt(i)}" y="${h-8}" text-anchor="middle" font-size="11" fill="#666">${s.label}</text>`).join("");
+  const dots=series.map((s,i)=>`<circle cx="${xAt(i)}" cy="${yAt(s.n)}" r="3.5" fill="#268DFF" stroke="#fff" stroke-width="1.5"/><text x="${xAt(i)}" y="${yAt(s.n)-8}" text-anchor="middle" font-size="11" fill="#333" font-family="Roboto,Arial">${s.n}</text>`).join("");
+  return `<svg class="line-chart" viewBox="0 0 ${w} ${h}">${grid}<polyline fill="none" stroke="#268DFF" stroke-width="2" points="${pts}"/>${dots}${labels}</svg>`;
+}
+function openKpi(k){ kpiKind=k; kpiProj="all"; kpiQ=""; kpiSt="all"; kpiBlKind="all"; go("kpi"); }
+function kpiHit(...parts){ return !kpiQ || parts.join(" ").includes(kpiQ); }
+function kpiSearch(ph){ return `<div class="search-bar">${ic("search")}<input placeholder="${ph}" value="${kpiQ}" oninput="kpiQ=this.value;render()" /></div>`; }
+function kpiChips(items){
+  return `<div class="chips">${items.map(([k,l])=>`<button class="chip ${kpiSt===k?"on":""}" onclick="kpiSt='${k}';render()">${l}</button>`).join("")}</div>`;
+}
+function pickChartProj(kind){
+  const cur=kind==="donut"?dashProject:lineProject;
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt ${cur==="all"?"on":""}" onclick="setChartProj('${kind}','all')">全部项目</div>
+    ${allProjects().map(p=>`<div class="opt ${cur===p?"on":""}" onclick="setChartProj('${kind}','${p}')">${p}</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function setChartProj(kind, v){
+  if (kind==="donut") dashProject=v; else lineProject=v;
+  closeSheet(); render();
+}
+function renderKpi(){
+  const company=isCompany();
+  const scope=company?kpiProj:"all";
+  const meta={
+    proj:{title:"在建项目数量", hint:company?"工程公司下属在建项目。点行查看该项目分包商。":"当前登录项目。"},
+    sub:{title:"在场分包商数量", hint:company?"按项目展开在场分包商。同一家单位在多个项目分别列出。":"本项目在场劳务分包商。"},
+    people:{title:"在场人员数量", hint:company?"下属各项目在场作业人员。":"本项目已建积分账户的作业人员。"},
+    vio:{title:"月度违章人数", hint:company?"各项目本月有扣分流水的人员，按人去重。":"本月存在扣分流水的人员。"},
+    train:{title:"停工培训人数", hint:company?"各项目当前处于停工培训的人员。":"当前分低于停工培训线、尚未清退的人员。"},
+    bl:{title:"黑名单对象", hint:company?"各项目已列入人员与分包商黑名单。":"本项目已列入的人员与分包商。"}
+  }[kpiKind]||{title:"下穿详情", hint:""};
+  $("#navTitle").textContent=meta.title;
+  const projFilt=company && kpiKind!=="proj"
+    ? `<div class="month-pick" onclick="pickKpiProj()">${projLabel(kpiProj)}${ic("chev")}</div>` : "";
+  let extra="", rows="", empty="暂无明细";
+  if (kpiKind==="proj"){
+    extra=kpiSearch("搜索项目名称");
+    const list=allProjects().filter(proj=>kpiHit(proj));
+    empty=allProjects().length?"无匹配项目":"暂无明细";
+    rows=list.map(proj=>{
+      const plist=livePeopleList(proj);
+      const subsN=subProjectRows(proj).length;
+      return `<div class="list-item" onclick="kpiKind='sub';kpiProj='${proj}';kpiQ='';kpiSt='all';render()">
+        <div class="grow"><div class="name">${proj}</div><div class="sub">分包商 ${subsN} · 人员 ${plist.length} · 均分 ${plist.length?Math.round(plist.reduce((a,p)=>a+p.score,0)/plist.length):"-"}</div></div>${ic("chev")}
+      </div>`;
+    }).join("");
+  } else if (kpiKind==="sub"){
+    extra=kpiSearch("搜索分包商 / 负责人")+kpiChips([["all","全部"],["ok","正常"],["bl","黑名单"]]);
+    const src=subProjectRows(scope);
+    const list=src.filter(r=>{
+      if (!kpiHit(r.s.name, r.s.lead, r.project||"")) return false;
+      const [st]=sStatus(r.s);
+      if (kpiSt==="ok") return st==="正常";
+      if (kpiSt==="bl") return st==="黑名单";
+      return true;
+    });
+    empty=src.length?"无匹配分包商":"暂无明细";
+    rows=list.map(r=>{
+      const [st,cls]=sStatus(r.s);
+      return `<div class="list-item" onclick="openSub('${r.s.id}','kpi')">
+        <div class="avatar sub">${r.s.name.slice(0,1)}</div>
+        <div class="grow"><div class="name">${r.s.name}</div><div class="sub">${company?r.project+" · ":""}${r.s.lead}</div></div>
+        <div class="score ${scoreCls(r.score)}">${r.score}</div>${tagHtml(st,cls)}${ic("chev")}
+      </div>`;
+    }).join("");
+  } else if (kpiKind==="people"){
+    extra=kpiSearch("搜索姓名 / 分包商 / 工种")+kpiChips([["all","全部"],["ok","正常"],["focus","重点管控"],["train","停工培训"],["bl","黑名单"]]);
+    const src=livePeopleList(scope);
+    const list=src.filter(p=>{
+      if (!kpiHit(p.name, subName(p.sub), p.job, p.project||"")) return false;
+      const [st,cls]=pStatus(p);
+      if (kpiSt==="ok") return cls==="ok";
+      if (kpiSt==="focus") return st==="重点管控";
+      if (kpiSt==="train") return st==="停工培训";
+      if (kpiSt==="bl") return st.indexOf("黑名单")>=0;
+      return true;
+    });
+    empty=src.length?"无匹配人员":"暂无明细";
+    rows=list.map(p=>{
+      const [st,cls]=pStatus(p);
+      return `<div class="list-item" onclick="openPerson('${p.id}','kpi')">
+        <div class="avatar">${p.name.slice(-1)}</div>
+        <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">${subName(p.sub)}${company?" · "+p.project:""}</div></div>
+        <div class="score ${scoreCls(p.score)}">${p.score}</div>${tagHtml(st,cls)}${ic("chev")}
+      </div>`;
+    }).join("");
+  } else if (kpiKind==="vio"){
+    extra=kpiSearch("搜索姓名 / 分包商 / 工种");
+    const src=monthVioPeople(monthKeyNow(), scope);
+    const list=src.filter(p=>kpiHit(p.name, subName(p.sub), p.job, p.project||""));
+    empty=src.length?"无匹配人员":"暂无明细";
+    rows=list.map(p=>`<div class="list-item" onclick="openPerson('${p.id}','vio')">
+      <div class="avatar">${p.name.slice(-1)}</div>
+      <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">${subName(p.sub)}${company?" · "+p.project:""}</div></div>
+      ${tagHtml("本月违章","warn")}${ic("chev")}
+    </div>`).join("");
+  } else if (kpiKind==="train"){
+    extra=kpiSearch("搜索姓名 / 分包商 / 工种");
+    const src=trainPeopleList(scope);
+    const list=src.filter(p=>kpiHit(p.name, subName(p.sub), p.job, p.project||""));
+    empty=src.length?"无匹配人员":"暂无明细";
+    rows=list.map(p=>{
+      const [st,cls]=pStatus(p);
+      return `<div class="list-item" onclick="openPerson('${p.id}','train')">
+        <div class="avatar">${p.name.slice(-1)}</div>
+        <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">${p.score} 分 · ${subName(p.sub)}</div></div>${tagHtml(st,cls)}${ic("chev")}
+      </div>`;
+    }).join("");
+  } else {
+    extra=`<div class="seg"><b class="${kpiBlKind==="all"?"on":""}" onclick="kpiBlKind='all';render()">全部</b><b class="${kpiBlKind==="p"?"on":""}" onclick="kpiBlKind='p';render()">人员</b><b class="${kpiBlKind==="s"?"on":""}" onclick="kpiBlKind='s';render()">分包商</b></div>`
+      +kpiSearch(kpiBlKind==="s"?"搜索分包商":"搜索姓名 / 分包商");
+    const ps=blPeopleList(scope).filter(p=>kpiHit(p.name, subName(p.sub), p.job, p.project||""));
+    const ss=blSubList(scope).filter(s=>kpiHit(s.name, s.lead||"", Object.keys(s.projects||{}).join(" ")));
+    const pRows=(kpiBlKind==="s"?[]:ps).map(p=>`<div class="list-item" onclick="openPerson('${p.id}','bl')">
+      <div class="avatar">${p.name.slice(-1)}</div>
+      <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">人员 · ${p.project}</div></div>${tagHtml("黑名单","danger")}${ic("chev")}
+    </div>`);
+    const sRows=(kpiBlKind==="p"?[]:ss).map(s=>`<div class="list-item" onclick="openSub('${s.id}','bl')">
+      <div class="avatar sub">${s.name.slice(0,1)}</div>
+      <div class="grow"><div class="name">${s.name}</div><div class="sub">分包商 · ${Object.keys(s.projects||{}).join("、")}</div></div>${tagHtml("黑名单","danger")}${ic("chev")}
+    </div>`);
+    empty=(blPeopleList(scope).length||blSubList(scope).length)?"无匹配对象":"暂无明细";
+    rows=pRows.join("")+sRows.join("");
+  }
+  return `${projFilt}${extra}<p class="hint">${meta.hint}</p><div class="card" style="margin:0 12px">${rows || `<div class="empty">${empty}</div>`}</div>`;
+}
+function pickKpiProj(){
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt ${kpiProj==="all"?"on":""}" onclick="kpiProj='all';closeSheet();render()">全部项目</div>
+    ${allProjects().map(p=>`<div class="opt ${kpiProj===p?"on":""}" onclick="kpiProj='${p}';closeSheet();render()">${p}</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function pickRole(){
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt ${role==="project"?"on":""}" onclick="setRole('project')">项目安全员 · ${CURRENT_PROJECT}</div>
+    <div class="opt ${role==="company"?"on":""}" onclick="setRole('company')">工程公司安监 · 全部项目</div>
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function setRole(r){
+  role=r; closeSheet();
+  snapProj="all";
+  if (isCompany() && (stack.includes("train")||ptsTab==="people")) { ptsTab="subs"; if (stack[stack.length-1]==="train") stack=["home"]; }
+  toast(roleLabel()); render();
+}
+
+function renderPoints(){
+  const peopleTab = !isCompany();
+  const segs = peopleTab
+    ? `<div class="seg"><b class="${ptsTab==="people"?"on":""}" onclick="ptsTab='people';render()">作业人员</b><b class="${ptsTab==="subs"?"on":""}" onclick="ptsTab='subs';render()">分包商</b></div>`
+    : `<p class="hint">公司层只看分包商积分，人员积分在项目端处理。</p>`;
+  if (ptsTab==="people" && peopleTab){
+    const list = visPeople().filter(p => {
+      if (qPeople && !(p.name+subName(p.sub)+p.job).includes(qPeople)) return false;
+      const [st,cls]=pStatus(p);
+      if (stFilter==="all") return true;
+      if (stFilter==="ok") return cls==="ok";
+      if (stFilter==="focus") return st==="重点管控";
+      if (stFilter==="train") return st==="停工培训";
+      if (stFilter==="bl") return st.indexOf("黑名单")>=0;
+      return true;
+    });
+    return segs + `<div class="search-bar">${ic("search")}<input placeholder="搜索姓名 / 分包商 / 工种" value="${qPeople}" oninput="qPeople=this.value;render()" /></div>
+      <div class="chips">${[["all","全部"],["ok","正常"],["focus","重点管控"],["train","停工培训"],["bl","黑名单"]].map(([k,l])=>`<button class="chip ${stFilter===k?"on":""}" onclick="stFilter='${k}';render()">${l}</button>`).join("")}</div>
+      <div class="card" style="margin:0 12px">${list.map(p=>{
+        const [st,cls]=pStatus(p);
+        return `<div class="list-item" onclick="openPerson('${p.id}','points')">
+          <div class="avatar">${p.name.slice(-1)}</div>
+          <div class="grow">
+            <div class="name">${p.name} · ${p.job}</div>
+            <div class="sub">${subName(p.sub)} · ${p.project}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="score ${scoreCls(p.score)}">${p.score}</div>
+            ${tagHtml(st,cls)}
+          </div>
+          ${ic("chev")}
+        </div>`;
+      }).join("") || `<div class="empty">无匹配人员</div>`}</div>`;
+  }
+  const list = visSubs().filter(s => !qSub || (s.name+s.lead).includes(qSub));
+  return segs + `<div class="search-bar">${ic("search")}<input placeholder="搜索分包商 / 负责人" value="${qSub}" oninput="qSub=this.value;render()" /></div>
+    <div class="card" style="margin:0 12px">${list.map(s=>{
+      const [st,cls]=sStatus(s);
+      const sc = isCompany() ? Math.round(Object.values(s.projects).reduce((a,b)=>a+b,0)/Object.keys(s.projects).length) : s.projects[CURRENT_PROJECT];
+      return `<div class="list-item" onclick="openSub('${s.id}','points')">
+        <div class="avatar sub">${s.name.slice(0,1)}</div>
+        <div class="grow">
+          <div class="name">${s.name}</div>
+          <div class="sub">${s.lead} · ${Object.keys(s.projects).join(" / ")}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="score ${scoreCls(sc)}">${sc}</div>
+          ${tagHtml(st,cls)}
+        </div>
+        ${ic("chev")}
+      </div>`;
+    }).join("") || `<div class="empty">无匹配分包商</div>`}</div>`;
+}
+
+function renderTodo(){
+  if (isCompany()){
+    return `<p class="hint">公司层待办以月度考核待阅为主，人员停工培训在项目端确认。</p>
+      <div class="card" style="margin:0 12px"><div class="todo-item" onclick="go('month')">
+        <div class="avatar">${ic("chart")}</div>
+        <div class="grow"><div class="name">2026-07 月度考核快照</div><div class="sub">25 日锁定 · 3 家分包商 · 5 名人员样本</div></div>
+        ${tagHtml("待阅","blue")}${ic("chev")}
+      </div></div>`;
+  }
+  const rows = pendingTrain();
+  const extra = visPeople().filter(p => pStatus(p)[0]==="停工培训" && !trainConfirms.some(c=>c.pid===p.id && c.status==="待确认"));
+  return `<p class="hint">培训完成并考试合格后，由项目安全员确认加分。默认建议 ${rules.plus} 分（首次合格），确认时可改。二次培训不加分。</p>
+    <div class="card" style="margin:0 12px">${
+      rows.map(c=>{
+        const p=people.find(x=>x.id===c.pid);
+        return `<div class="list-item" onclick="openPerson('${p.id}','todo')">
+          <div class="avatar">${p.name.slice(-1)}</div>
+          <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">${c.course}<br>${c.doneAt} · ${c.hours} 学时 · 考试 ${c.exam}</div></div>
+          ${tagHtml("待确认","warn")}${ic("chev")}
+        </div>`;
+      }).join("") + extra.map(p=>`<div class="list-item" onclick="openPerson('${p.id}','todo')">
+        <div class="avatar">${p.name.slice(-1)}</div>
+        <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">低于 ${rules.train} 分，培训进行中</div></div>
+        ${tagHtml("培训中","blue")}${ic("chev")}
+      </div>`).join("") || `<div class="empty">暂无停工培训事项</div>`
+    }</div>`;
+}
+
+function renderFiles(){
+  const pn = personBL.filter(x=>!x.removed && (isCompany()||x.project===CURRENT_PROJECT)).length;
+  const sn = subBL.filter(x=>!x.removed && (isCompany()||x.project===CURRENT_PROJECT)).length;
+  return `<div class="card" style="margin:12px">
+    <div class="menu-item" onclick="go('bl')">
+      <div class="g-ico" style="background:#FA2A31;width:40px;height:40px;border-radius:10px">${ic("user")}</div>
+      <div class="grow"><div class="name">黑名单库</div><div class="sub">人员 ${pn} · 分包商 ${sn} · 本工程公司范围</div></div>${ic("chev")}
+    </div>
+    <div class="menu-item" onclick="go('month')">
+      <div class="g-ico" style="background:#268DFF;width:40px;height:40px;border-radius:10px">${ic("chart")}</div>
+      <div class="grow"><div class="name">月度考核</div><div class="sub">每月 ${25} 日锁定累计分，不清零</div></div>${ic("chev")}
+    </div>
+  </div>`;
+}
+
+function renderPerson(){
+  const p = people.find(x=>x.id===window._pid) || visPeople()[0];
+  if (!p) return `<div class="empty">未找到人员档案</div>`;
+  return `<div class="detail-head">
+      <div class="avatar">${p.name.slice(-1)}</div>
+      <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">${subName(p.sub)} · ${p.project}</div></div>
+      <div class="score ${scoreCls(p.score)}">${p.score}</div>
+    </div>
+    <div class="seg"><b class="${blpTab==="flow"?"on":""}" onclick="blpTab='flow';render()">积分流水</b><b class="${blpTab==="edu"?"on":""}" onclick="blpTab='edu';render()">培训详情</b></div>
+    ${blpTab==="edu"?archiveEduBody(p, blpEduTab, "blpEduTab"):personFlowHtml(p)}`;
+}
+function renderSub(){
+  const s = subs.find(x=>x.id===window._sid) || visSubs()[0];
+  if (!s) return `<div class="empty">未找到分包商档案</div>`;
+  const sc = isCompany() ? Math.round(Object.values(s.projects).reduce((a,b)=>a+b,0)/Object.keys(s.projects).length) : (s.projects[CURRENT_PROJECT]!=null?s.projects[CURRENT_PROJECT]:s.score);
+  return `<div class="detail-head">
+      <div class="avatar sub">${s.name.slice(0,1)}</div>
+      <div class="grow"><div class="name">${s.name}</div><div class="sub">负责人 ${s.lead}</div></div>
+      <div class="score ${scoreCls(sc)}">${sc}</div>
+    </div>
+    <div class="seg"><b class="${blsTab==="flow"?"on":""}" onclick="blsTab='flow';render()">积分流水</b><b class="${blsTab==="info"?"on":""}" onclick="blsTab='info';render()">分包商详情</b></div>
+    ${blsTab==="info"?subDetailBody(s):subFlowHtml(s)}`;
+}
+function personBLHit(p){
+  if (!p) return null;
+  if ((p.trainCount||0)>=2) return {rule:"二次停工培训", reason:`累计停工培训 ${p.trainCount} 次，按规定列入人员黑名单。当前分 ${p.score}`};
+  if (p.score<rules.out) return {rule:"累计分低于清退线", reason:`当前分 ${p.score}，低于清退线 ${rules.out} 分`};
+  return null;
+}
+function plusDays(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function plusDaysFrom(at, n){
+  const d=new Date((at||today())+"T00:00:00");
+  d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+}
+function seedNum(s, n){
+  let h=0;
+  for (const c of String(s)) h=(h*33+c.charCodeAt(0))>>>0;
+  return n?h%n:h;
+}
+function signMark(name){
+  return `<svg class="arch-sign" viewBox="0 0 120 36" aria-hidden="true"><text x="6" y="26" font-family="KaiTi,STKaiti,'PingFang SC',serif" font-size="18" fill="#333">${name||""}</text></svg>`;
+}
+function isSpecialJob(job){ return /焊工|电工|起重|接触网|架子/.test(job||""); }
+function personTeam(p){
+  return {接触网工:"接触网班",起重司索:"起重班",电工:"电工班",普工:"普工班",防护员:"防护班",焊工:"焊工班",架子工:"架子班",钢筋工:"钢筋班",混凝土工:"混凝土班"}[p.job]||"-";
+}
+function personArchive(p){
+  const age=32+seedNum(p.id,20);
+  const birthY=2026-age;
+  const birthM=String(1+seedNum(p.id+"m",12)).padStart(2,"0");
+  const birthD=String(1+seedNum(p.id+"d",27)).padStart(2,"0");
+  const head=["130123","140105","130102","130184"][seedNum(p.id,4)];
+  const idNo=head+birthY+birthM+birthD+String(1000+seedNum(p.id+"i",8000)).slice(-4);
+  const pre=["138","139","150","182","187"][seedNum(p.id,5)];
+  const phone=pre+String(80000000+seedNum(p.id+"ph",19999999)).slice(-8);
+  const rel=["配偶","父子","兄弟"][seedNum(p.id,3)];
+  const emerg=rel==="配偶"?p.name[0]+"秀兰":rel==="父子"?p.name[0]+"卫国":p.name[0]+"卫东";
+  const emergPhone=["139","158","195"][seedNum(p.id,3)]+String(70000000+seedNum(p.id+"em",29999999)).slice(-8);
+  const addr={
+    "雄忻高铁 3 标":"河北省保定市竞秀区建设南路 "+(12+seedNum(p.id,80))+" 号",
+    "太焦接触网":"山西省晋中市榆次区迎宾街 "+(8+seedNum(p.id,40))+" 号",
+    "京唐站改":"河北省唐山市路北区建设路 "+(20+seedNum(p.id,60))+" 号",
+    "大西高铁":"山西省太原市小店区平阳路 "+(16+seedNum(p.id,50))+" 号"
+  }[p.project]||"河北省保定市竞秀区建设南路 18 号";
+  const eduLv=["初中","高中","中专","技校"][seedNum(p.id,4)];
+  const special=isSpecialJob(p.job);
+  const certName={焊工:"熔化焊接与热切割作业",电工:"低压电工作业",起重司索:"起重司索作业",接触网工:"高压电工作业",架子工:"登高架设作业"}[p.job]||"";
+  const certs=[{name:"建筑施工从业人员考核合格证", no:"AQ"+p.id.toUpperCase()+"-2026", org:"项目安全教育管理机构", from:plusDaysFrom(p.inAt,-6), to:"2029-12-31"}];
+  if (special && certName) certs.unshift({name:certName, no:"T"+p.id.toUpperCase()+"-2024", org:"应急管理厅", from:"2024-03-01", to:"2030-03-01"});
+  const score=(key, base)=>base+seedNum(p.id+key, 8);
+  const trains=[
+    {theme:`班组级入场教育（${(p.inAt||"").replace(/-/g,"")}）`, type:"入场三级教育", edu:"班组级入场教育", from:plusDaysFrom(p.inAt,-2), to:p.inAt, hours:20, score:score("tb",90)},
+    {theme:`项目级入场教育（${plusDaysFrom(p.inAt,-4).replace(/-/g,"")}）`, type:"入场三级教育", edu:"项目级入场教育", from:plusDaysFrom(p.inAt,-4), to:plusDaysFrom(p.inAt,-2), hours:15, score:score("tp",88)},
+    {theme:`公司级入场教育（${plusDaysFrom(p.inAt,-7).replace(/-/g,"")}）`, type:"入场三级教育", edu:"公司级入场教育", from:plusDaysFrom(p.inAt,-7), to:plusDaysFrom(p.inAt,-4), hours:24, score:score("tc",92)}
+  ].map(r=>({...r, project:p.project, status:"已完成", result:r.score>=60?"及格":"不及格"}));
+  if ((p.trainCount||0)>0){
+    trains.unshift({theme:"停工复岗教育", type:"停工培训", edu:"停工复岗教育", project:p.project, from:plusDaysFrom(today(),-rules.days), to:today(), hours:16, status:"已完成", score:score("tt",86), result:"及格"});
+  }
+  const reports=[`tj-${p.id}-1.jpg`];
+  if (seedNum(p.id,2)) reports.push(`tj-${p.id}-2.jpg`);
+  return {
+    sex:"男", phoneShow:phone.slice(0,3)+"****"+phone.slice(-4),
+    idShow:idNo.slice(0,6)+"********"+idNo.slice(-4),
+    birth:`${birthY}-${birthM}-${birthD}`, age, nation:"汉", edu:eduLv,
+    emerg, emergShow:emergPhone.slice(0,3)+"****"+emergPhone.slice(-4), rel, addr,
+    special, certs, trains, reports, team:personTeam(p),
+    contract:seedNum(p.id,3)?"劳务合同.pdf":""
+  };
+}
+function showTrainScore(pid, idx){
+  const p=people.find(x=>x.id===pid); if(!p) return;
+  const r=personArchive(p).trains[idx]; if(!r) return;
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">考试成绩</div>
+    <p class="msg">${p.name}　${r.theme}<br>考试成绩 <b>${r.score}</b>　及格线 60 分</p>
+    <p class="hint">成绩由劳务教育同步，本页只读。</p>
+    <div class="opt cancel" onclick="closeSheet()">关闭</div></div>`);
+}
+function archiveEduBody(p, tab, tabVar){
+  const a=personArchive(p);
+  const inner=`<div class="seg"><b class="${tab==="info"?"on":""}" onclick="${tabVar}='info';render()">人员信息</b><b class="${tab==="cert"?"on":""}" onclick="${tabVar}='cert';render()">人员证书</b><b class="${tab==="train"?"on":""}" onclick="${tabVar}='train';render()">培训记录</b></div>
+    <p class="hint">人员教育档案由劳务教育同步，只读查看进场基本信息、证书与三级教育记录。</p>`;
+  if (tab==="cert"){
+    return inner+`<div class="card" style="margin:0 12px 12px">${a.certs.map((c,i)=>`<div class="log-item" style="align-items:flex-start">
+      <div class="grow"><div class="name">${i+1}. ${c.name}</div>
+      <div class="card-sub">${c.no}<br>${c.org}<br>${c.from} ~ ${c.to}</div>
+      <div class="link" style="margin-top:4px;font-size:13px" onclick="toast('劳务教育证书附件：${c.no}.jpg')">查看附件</div></div>
+    </div>`).join("")||`<div class="empty">暂无证书</div>`}</div>`;
+  }
+  if (tab==="train"){
+    return inner+`<div class="card" style="margin:0 12px 12px">${a.trains.map((r,i)=>`<div class="log-item" style="align-items:flex-start">
+      <div class="grow"><div class="name">${i+1}. ${r.theme}</div>
+      <div class="card-sub">${r.type} · ${r.edu}<br>${r.project}　${r.from} ~ ${r.to}<br>${r.hours} 学时 · ${tagHtml(r.status,"ok")} · ${r.result}</div>
+      <div class="link" style="margin-top:4px;font-size:13px" onclick="showTrainScore('${p.id}',${i})">成绩 ${r.score}</div></div>
+      <div>${signMark(p.name)}</div>
+    </div>`).join("")}</div>`;
+  }
+  return inner+`<div class="media-row">
+      <div class="media-item"><div class="arch-photo">${p.name.slice(0,1)}</div><div class="media-cap">近照</div></div>
+      <div class="media-item"><div class="arch-idcard">身份证人像面</div><div class="media-cap">身份证正面</div></div>
+      <div class="media-item"><div class="arch-idcard">身份证国徽面</div><div class="media-cap">身份证反面</div></div>
+    </div>
+    <div class="sec-h" style="margin:12px 16px 8px">基本信息</div>
+    <div class="kv">
+      <div class="row"><div class="k">姓名</div><div class="v">${p.name}</div></div>
+      <div class="row"><div class="k">性别</div><div class="v">${a.sex}</div></div>
+      <div class="row"><div class="k">联系电话</div><div class="v">${a.phoneShow}</div></div>
+      <div class="row"><div class="k">身份证号</div><div class="v">${a.idShow}</div></div>
+      <div class="row"><div class="k">出生日期</div><div class="v">${a.birth}</div></div>
+      <div class="row"><div class="k">年龄</div><div class="v">${a.age} 岁</div></div>
+      <div class="row"><div class="k">民族</div><div class="v">${a.nation}</div></div>
+      <div class="row"><div class="k">学历</div><div class="v">${a.edu}</div></div>
+      <div class="row"><div class="k">紧急联系人</div><div class="v">${a.emerg}</div></div>
+      <div class="row"><div class="k">联系人电话</div><div class="v">${a.emergShow}</div></div>
+      <div class="row"><div class="k">与本人关系</div><div class="v">${a.rel}</div></div>
+      <div class="row"><div class="k">家庭住址</div><div class="v">${a.addr}</div></div>
+    </div>
+    <div class="sec-h" style="margin:12px 16px 8px">工作信息</div>
+    <div class="kv" style="margin-bottom:12px">
+      <div class="row"><div class="k">所属公司</div><div class="v">${subName(p.sub)}</div></div>
+      <div class="row"><div class="k">所属班组</div><div class="v">${a.team}</div></div>
+      <div class="row"><div class="k">工种</div><div class="v">${p.job}</div></div>
+      <div class="row"><div class="k">特种人员</div><div class="v">${a.special?"是":"否"}</div></div>
+      <div class="row"><div class="k">进场日期</div><div class="v">${p.inAt}</div></div>
+      <div class="row"><div class="k">专职安管</div><div class="v">否</div></div>
+      <div class="row"><div class="k">岗位</div><div class="v">分包作业人员</div></div>
+      <div class="row"><div class="k">手签</div><div class="v">${signMark(p.name)}</div></div>
+      <div class="row"><div class="k">体检报告</div><div class="v">${a.reports.map(f=>`<span class="link" onclick="toast('劳务教育附件预览：${f}')">${f}</span>`).join(" ")}</div></div>
+      <div class="row"><div class="k">合同</div><div class="v">${a.contract?`<span class="link" onclick="toast('劳务教育附件预览：${a.contract}')">${a.contract}</span>`:"--"}</div></div>
+    </div>`;
+}
+function blGrade(s){
+  if (inSBL(s)||s.status==="黑名单") return "黑名单";
+  if (s.score>=90) return "A";
+  if (s.score>=80) return "B";
+  return "C";
+}
+function subProfile(s){
+  const bl=inSBL(s)||s.status==="黑名单";
+  const short=s.name.replace(/有限公司|劳务公司|劳务队|劳务$/g,"").slice(0,8);
+  const area={s1:["河北省保定市","91130606MA00JT01X1","0312","冀"],s2:["河北省石家庄市","91130104MA00XQ02Y2","0311","冀"],s3:["山西省太原市","91140105MA00TJ03Z3","0351","晋"]}[s.id]||["河北省保定市","91130000MA00LS00X0","0312","冀"];
+  const phone=area[2]+"-"+String(58000000+seedNum(s.id,3999999)).slice(-8);
+  const legalPhone="13"+String(8000000000+seedNum(s.id+"lp",1999999999)).slice(-9);
+  const leadPhone="13"+String(9000000000+seedNum(s.id+"ld",999999999)).slice(-9);
+  const founded=s.inAt?s.inAt.slice(0,4)+"-"+["03","05","06","08"][seedNum(s.id,4)]+"-15":"2018-06-15";
+  const evalSt=bl?"不合格":s.score>=85?"合格":"待复核";
+  const cap=["300","500","800","1200"][seedNum(s.id,4)]+" 万元";
+  const license=area[3]+"建安许证字〔2024〕第 "+String(1000+seedNum(s.id,8000))+" 号";
+  const addr=area[0]+"建设路 "+(18+seedNum(s.id,60))+" 号";
+  const bankNo="12"+String(1000000000000000+seedNum(s.id+"bk",899999999999999)).slice(-15);
+  const legal=s.legal||{s1:"冀铁法人",s2:"线桥法人",s3:"太接法人"}[s.id]||"法定代表人";
+  return {
+    short, uscc:area[1], code:"", phone, evalSt, scope:"劳务分包、铁路电气化辅助作业",
+    type:"劳务分包", nature:"有限责任公司", founded, addr, identity:"法人单位",
+    gov:"否", grade:bl?"":"三级", email:"", capital:cap, parent:"", cat:"公司",
+    tax:"小规模纳税人", legal, legalId:area[1].slice(0,6)+"********"+String(1000+seedNum(s.id,8000)).slice(-4),
+    legalJob:"执行董事", legalTitle:"", legalPhone:legalPhone.slice(0,3)+"****"+legalPhone.slice(-4),
+    contact:s.lead, contactPhone:leadPhone.slice(0,3)+"****"+leadPhone.slice(-4),
+    license, licenseOrg:area[0]+"住房和城乡建设局", licenseTo:"2028-12-31",
+    start:founded, end:"", post:"", remark:"", source:"劳务教育同步",
+    bl:bl?"是":"否", attach:bl?"列入黑名单说明.pdf":"",
+    bankName:s.name, bank:"中国建设银行 "+area[0].slice(2)+"分行", bankNo:bankNo.slice(0,4)+" **** **** "+bankNo.slice(-4),
+    quals:[
+      {name:"建筑业企业资质 · 施工劳务", no:area[3]+"建劳务〔2023〕"+String(200+seedNum(s.id,700)), org:area[0]+"住房和城乡建设局", from:"2023-04-01", to:"2028-04-01"},
+      {name:"安全生产许可证", no:license, org:area[0]+"住房和城乡建设局", from:"2024-03-01", to:"2027-03-01"}
+    ]
+  };
+}
+function subKv(pairs){
+  return `<div class="kv wide">${pairs.map(([k,v])=>`<div class="row"><div class="k">${k}</div><div class="v">${v==null||v===""?"--":v}</div></div>`).join("")}</div>`;
+}
+function subDetailBody(s){
+  const a=subProfile(s);
+  const tabs=[["base","基本信息"],["bank","银行信息"],["qual","企业资质"],["people","相关人员"],["proj","项目履历"]];
+  const bar=`<div class="chips" style="padding-top:0">${tabs.map(([k,l])=>`<button class="chip ${subDetailTab===k?"on":""}" onclick="subDetailTab='${k}';render()">${l}</button>`).join("")}</div>
+    <p class="hint">分包商基本信息由劳务教育 / 供应商库同步，本页只读。</p>`;
+  if (subDetailTab==="bank"){
+    return bar+subKv([["开户名称", a.bankName], ["开户银行", a.bank], ["银行账号", a.bankNo]]);
+  }
+  if (subDetailTab==="qual"){
+    return bar+`<div class="card" style="margin:0 12px 12px">${a.quals.map((q,i)=>`<div class="log-item" style="align-items:flex-start"><div class="grow">
+      <div class="name">${i+1}. ${q.name}</div>
+      <div class="card-sub">${q.no}<br>${q.org}<br>${q.from} ~ ${q.to}</div>
+    </div></div>`).join("")}</div>`;
+  }
+  if (subDetailTab==="people"){
+    const rows=[[a.legal,"法定代表人", a.legalPhone],[s.lead,"现场负责人", a.contactPhone]];
+    return bar+`<div class="card" style="margin:0 12px 12px">${rows.map(r=>`<div class="log-item" style="align-items:flex-start"><div class="grow">
+      <div class="name">${r[0]} · ${r[1]}</div>
+      <div class="card-sub">${r[2]}</div>
+    </div></div>`).join("")}</div>`;
+  }
+  if (subDetailTab==="proj"){
+    const projs=Object.entries(s.projects||{});
+    return bar+`<div class="card" style="margin:0 12px 12px">${projs.map(([k,v])=>`<div class="list-item"><div class="grow"><div class="name">${k}</div><div class="sub">在场</div></div><div class="score ${scoreCls(v)}">${v}</div></div>`).join("")||`<div class="empty">暂无项目履历</div>`}</div>`;
+  }
+  return bar+`<div class="sec-h" style="margin:0 16px 8px">基础信息</div>
+    ${subKv([
+      ["企业名称", s.name], ["企业简称", a.short], ["政府/军队/境外", a.gov],
+      ["统一社会信用代码", a.uscc], ["企业类型", a.type], ["资质等级", a.grade],
+      ["企业编码", a.code], ["企业性质", a.nature], ["企业邮箱", a.email],
+      ["电话", a.phone], ["成立日期", a.founded], ["注册资金", a.capital],
+      ["评价状态", a.evalSt], ["地址", a.addr], ["上级单位", a.parent],
+      ["经营范围", a.scope], ["身份类型", a.identity], ["供应商分类", a.cat]
+    ])}
+    <div class="sec-h" style="margin:12px 16px 8px" onclick="subInfoMore=!subInfoMore;render()">更多<span class="more">${subInfoMore?"收起":"展开"}</span></div>
+    ${subInfoMore?subKv([
+      ["纳税人类型", a.tax], ["评价等级", blGrade(s)], ["法人联系电话", a.legalPhone],
+      ["法定代表人", a.legal], ["法人职务", a.legalJob], ["法人职称", a.legalTitle],
+      ["法人身份证号", a.legalId], ["注册日期", a.founded], ["联系人", a.contact],
+      ["联系人电话", a.contactPhone], ["邮编", a.post], ["安全生产许可证", a.license],
+      ["许可证有效日期", a.licenseTo], ["许可证颁发机关", a.licenseOrg], ["黑名单", a.bl],
+      ["营业开始日期", a.start], ["营业结束日期", a.end], ["来源", a.source],
+      ["注册地", a.addr], ["备注", a.remark],
+      ["附件", a.attach?`<span class="link" onclick="toast('供应商库附件：${a.attach}')">${a.attach}</span>`:""],
+      ["详细地址", a.addr]
+    ])+`<div style="height:12px"></div>`:""}`;
+}
+function examPassLine(){ return 60; }
+function suggestTrainPlus(p, exam){
+  if ((p.trainCount||0)>=2) return 0;
+  if (exam==null || exam<examPassLine()) return 0;
+  return rules.plus;
+}
+function renderActs(){
+  const bar=$("#actbar");
+  const page=stack[stack.length-1];
+  let html="";
+  if (page==="person"||page==="blp"||page==="archive") html=personActsHtml();
+  else if (page==="sub"||page==="bls"||page==="subinfo") html=subActsHtml();
+  if (!html){ bar.classList.remove("show"); bar.innerHTML=""; return; }
+  bar.classList.add("show");
+  bar.innerHTML=html;
+}
+function personActsHtml(){
+  if (isCompany() || detailFrom==="month") return "";
+  const p=people.find(x=>x.id===window._pid);
+  if (!p) return "";
+  const [st]=pStatus(p);
+  const btns=[];
+  if (inPBL(p)){
+    if (detailFrom!=="bl") btns.push(`<button class="btn" onclick="viewPersonBL('${p.id}')">查看黑名单</button>`);
+    return btns.join("");
+  }
+  if (detailFrom==="todo" || detailFrom==="train"){
+    btns.push(`<button class="btn ghost" onclick="askNotice('${p.id}')">下发通知书</button>`);
+    btns.push(`<button class="btn" onclick="goConfirmPlus('${p.id}')">确认加分</button>`);
+    if (personBLHit(p)) btns.push(`<button class="btn danger wide" onclick="askBL('${p.id}')">列入黑名单</button>`);
+    return btns.join("");
+  }
+  if (st==="重点管控") btns.push(`<button class="btn" onclick="askRemind('${p.id}')">提醒</button>`);
+  if (st==="停工培训"){
+    btns.push(`<button class="btn ghost" onclick="askNotice('${p.id}')">下发通知书</button>`);
+    btns.push(`<button class="btn" onclick="goConfirmPlus('${p.id}')">确认加分</button>`);
+  }
+  if (personBLHit(p)) btns.push(`<button class="btn danger wide" onclick="askBL('${p.id}')">列入黑名单</button>`);
+  return btns.join("");
+}
+function subActsHtml(){
+  const s=subs.find(x=>x.id===window._sid);
+  if (!s) return "";
+  if (detailFrom==="month") return "";
+  if (isCompany()){
+    return (inSBL(s)&&detailFrom!=="bl")?`<button class="btn" onclick="viewSubBL('${s.id}')">查看黑名单</button>`:"";
+  }
+  if (inSBL(s)){
+    const view=detailFrom==="bl"?"":`<button class="btn" onclick="viewSubBL('${s.id}')">查看黑名单</button>`;
+    return `<button class="btn ghost" onclick="askEval('${s.id}')">人工评价</button>${view}`;
+  }
+  return `<button class="btn" onclick="askEval('${s.id}')">人工评价</button><button class="btn danger" onclick="askSubBL('${s.id}')">列入黑名单</button>`;
+}
+function askRemind(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">重点管控提醒</div>
+    <p class="msg">${p.name} 当前 <b>${p.score}</b> 分，已低于 ${rules.warn} 分。推送后请本人关注扣分，避免降至停工培训线 ${rules.train} 分。</p>
+    <div class="opt on" onclick="doRemind('${id}')">推送提醒</div>
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function doRemind(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  p.logs.unshift({t:today(), d:"已向人员推送重点管控提醒：当前分 "+p.score+"，请关注积分扣分情况。"});
+  closeSheet(); toast("已提醒 "+p.name+" 关注积分扣分情况"); render();
+}
+function askNotice(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  const n=(p.notices||0)+1;
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">停工培训通知书</div>
+    <p class="msg">${p.name} · ${p.job}<br>当前 <b>${p.score}</b> 分，第 ${n} 次通知。<br>立即停工，${plusDays(rules.days)} 前完成再教育考核，合格后方可复岗。</p>
+    <div class="opt on" onclick="doNotice('${id}')">导出并推送人员</div>
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function doNotice(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  p.notices=(p.notices||0)+1;
+  p.logs.unshift({t:today(), d:"已下发停工培训通知书并推送人员：当前分 "+p.score+"，期限 "+plusDays(rules.days)+"。"});
+  closeSheet();
+  toast(p.notices>=2 && p.score>=rules.out ? "通知书已推送。累计 2 次停工培训通知，请评估清退" : "通知书已推送给 "+p.name);
+  render();
+}
+function goConfirmPlus(id){
+  const c=trainConfirms.find(x=>x.pid===id && x.status==="待确认");
+  if (!c){ toast("尚未从劳务教育同步停工成绩"); return; }
+  window._cid=c.id; go("train");
+}
+function askBL(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  const hit=personBLHit(p)||{rule:"直接判定列入", reason:"项目按清退/黑名单规则直接判定列入"};
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">列入人员黑名单</div>
+    <p class="msg">${p.name} 当前 <b>${p.score}</b> 分<br>列入规则：<b>${hit.rule}</b><br>${hit.reason}。确认后立即列入本工程公司人员黑名单，无审核流转。</p>
+    <div class="opt on" onclick="doBL('${id}')">确认列入</div>
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function doBL(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  if (inPBL(p)){ closeSheet(); toast(p.name+" 已在人员黑名单"); render(); return; }
+  const hit=personBLHit(p)||{rule:"直接判定列入", reason:"按规则直接列入人员黑名单"};
+  personBL.unshift({id:"pb"+Date.now(), pid:p.id, name:p.name, job:p.job, project:p.project, sub:p.sub, rule:hit.rule, reason:hit.reason, time:today(), removed:false});
+  p.logs.unshift({t:today(), d:`按规则列入人员黑名单：${hit.rule}。${hit.reason}`});
+  closeSheet(); toast(p.name+" 已列入人员黑名单"); render();
+}
+function viewPersonBL(id){
+  const p=people.find(x=>x.id===id);
+  blTab="p"; qBl=p?p.name:""; go("bl");
+}
+function askEval(id){
+  const s=subs.find(x=>x.id===id); if(!s) return;
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">人工评价</div>
+    <p class="msg">${s.name} 当前 <b>${s.score}</b> 分。第十五条 / 十六条与牌标准可并行扣分，状态不因分数自动变更。</p>
+    ${evalClauses.map(c=>`<div class="opt" onclick="confirmEval('${id}','${c.id}')">${c.name}（扣 ${c.score} 分）</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function confirmEval(id, cid){
+  const s=subs.find(x=>x.id===id); const c=evalClauses.find(x=>x.id===cid); if(!s||!c) return;
+  const next=Math.max(0, +(s.score-c.score).toFixed(1));
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">确认扣分</div>
+    <p class="msg">${c.name}<br>扣 ${c.score} 分后为 <b>${next}</b> 分，并生成安全不良行为记录单。</p>
+    <div class="opt on" onclick="doEval('${id}','${cid}')">扣分并导出记录单</div>
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function doEval(id, cid){
+  const s=subs.find(x=>x.id===id); const c=evalClauses.find(x=>x.id===cid); if(!s||!c) return;
+  s.score=Math.max(0, +(s.score-c.score).toFixed(1));
+  if (s.projects && s.projects[CURRENT_PROJECT]!=null){
+    s.projects[CURRENT_PROJECT]=Math.max(0, +(s.projects[CURRENT_PROJECT]-c.score).toFixed(1));
+  }
+  s.logs.unshift({t:today(), d:c.name+"，扣 "+c.score+" 分。现场核查属实。"});
+  closeSheet(); toast("已扣 "+c.score+" 分，记录单已生成"); render();
+}
+function askSubBL(id){
+  const s=subs.find(x=>x.id===id); if(!s) return;
+  if (inSBL(s)){ viewSubBL(id); return; }
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt" style="font-weight:600">列入分包商黑名单</div>
+    <p class="msg">${s.name} 当前 <b>${s.score}</b> 分。第十四条不走普通扣分；累计分过低按当时分数记入。确认后立即列入，无审核流转。</p>
+    ${subBLRules.map(r=>`<div class="opt" onclick="doSubBL('${id}','${r.id}')">${r.name}</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function doSubBL(id, rid){
+  const s=subs.find(x=>x.id===id); const r=subBLRules.find(x=>x.id===rid); if(!s||!r) return;
+  if (inSBL(s)){ closeSheet(); toast(s.name+" 已在分包商黑名单"); render(); return; }
+  const reason=r.id==="score"?`当前分 ${s.score}，经核查属实，按累计分过低直接列入。`:(r.name+"。经核查属实，按规则直接列入劳务分包商黑名单。");
+  subBL.unshift({id:"sb"+Date.now(), sid:s.id, name:s.name, rule:r.rule, reason, time:today(), removed:false, project:CURRENT_PROJECT});
+  s.status="黑名单";
+  s.logs.unshift({t:today(), d:`${r.rule} · ${r.name}，直接列入劳务分包商黑名单。${reason}`});
+  closeSheet(); toast(s.name+" 已列入分包商黑名单"); render();
+}
+function viewSubBL(id){
+  const s=subs.find(x=>x.id===id);
+  blTab="s"; qBl=s?s.name:""; go("bl");
+}
+function openPerson(pid, from){
+  if (!people.find(x=>x.id===pid)){ toast("未找到人员档案"); return; }
+  window._pid=pid; detailFrom=from||"points"; blpTab="flow"; blpEduTab="info"; go("person");
+}
+function openSub(sid, from){
+  if (!subs.find(x=>x.id===sid)){ toast("未找到分包商档案"); return; }
+  window._sid=sid; detailFrom=from||"points"; blsTab="flow"; subDetailTab="base"; go("sub");
+}
+function personFlowHtml(p){
+  const rec = personBL.find(x=>!x.removed && (x.pid===p.id || x.name===p.name))||{};
+  const [st,cls]=pStatus(p);
+  const logs = (p.logs||[]).length ? p.logs.map(l=>`<div class="log-item"><div class="when">${l.t}</div><div class="grow">${l.d}</div></div>`).join("") : `<div class="empty">暂无积分流水</div>`;
+  const blRows = rec.rule?`<div class="row"><div class="k">列入规则</div><div class="v">${rec.rule}</div></div>
+      <div class="row"><div class="k">列入原因</div><div class="v">${rec.reason||rec.src||"-"}</div></div>
+      <div class="row"><div class="k">列入时间</div><div class="v">${rec.time||"-"}</div></div>`:"";
+  return `<div class="kv">
+      <div class="row"><div class="k">状态</div><div class="v">${tagHtml(st,cls)}</div></div>
+      <div class="row"><div class="k">进场日期</div><div class="v">${p.inAt}</div></div>
+      <div class="row"><div class="k">停工培训</div><div class="v">${p.trainCount||0} 次</div></div>
+      ${blRows}
+    </div>
+    <div class="sec-h" style="margin:12px 16px 8px">账户流水</div>
+    <div class="card" style="margin:0 12px 12px">${logs}</div>
+    ${isCompany()?`<p class="hint">公司层只查阅人员积分，提醒、通知书、加分与列入黑名单在项目端操作。</p>`:""}`;
+}
+function subFlowHtml(s){
+  const rec = subBL.find(x=>!x.removed && x.sid===s.id)||{};
+  const [st,cls]=sStatus(s);
+  const events=[...s.logs||[],...s.links||[]];
+  const logs = events.length ? events.map(l=>`<div class="log-item"><div class="when">${l.t}</div><div class="grow">${l.d}</div></div>`).join("") : `<div class="empty">暂无积分流水</div>`;
+  const blRows = rec.rule?`<div class="row"><div class="k">列入规则</div><div class="v">${rec.rule}</div></div>
+      <div class="row"><div class="k">列入原因</div><div class="v">${rec.reason||"-"}</div></div>
+      <div class="row"><div class="k">列入时间</div><div class="v">${rec.time||"-"}</div></div>`:"";
+  return `<div class="kv">
+      <div class="row"><div class="k">状态</div><div class="v">${tagHtml(st,cls)}</div></div>
+      <div class="row"><div class="k">进场日期</div><div class="v">${s.inAt}</div></div>
+      ${blRows}
+    </div>
+    <div class="sec-h" style="margin:12px 16px 8px">账户流水</div>
+    <div class="card" style="margin:0 12px 12px">${logs}</div>
+    ${isCompany()?`<p class="hint">公司层只查阅分包商积分，人工评价与列入黑名单在项目端操作。</p>`:""}`;
+}
+function renderBLPerson(){ return renderPerson(); }
+function renderBLSub(){ return renderSub(); }
+function renderArchive(){ return renderPerson(); }
+function renderSubInfo(){ return renderSub(); }
+function renderTrain(){
+  const c = trainConfirms.find(x=>x.id===window._cid) || trainConfirms[0];
+  const p = people.find(x=>x.id===c.pid);
+  const second=(p.trainCount||0)>=2;
+  const pass=c.exam>=examPassLine();
+  const confirmed=c.status==="已确认";
+  const currentPlus=confirmed?(+c.plus||0):suggestTrainPlus(p, c.exam);
+  const prev=confirmed?(+c.plus||0):0;
+  const next=+(p.score+(currentPlus-prev)).toFixed(1);
+  const hint=second?"第二次停工培训不可复岗加分，应走清退/黑名单。":(pass?"对照学习内容与成绩判断加分，分值可再调整。":"成绩未达标，建议不加分；如现场复核通过，仍可调整分值。");
+  const okLabel=confirmed?"保存调整":(currentPlus>0?`确认加 ${currentPlus} 分并复工`:"确认不加分并复工");
+  let actions="";
+  if (isCompany()){
+    actions=`<p class="hint">公司层只查阅培训结果，确认加分在项目端操作。</p>`;
+  } else if (second){
+    actions=`<p class="hint">${hint}</p><div class="foot"><button class="btn danger" onclick="askBL('${p.id}')">列入黑名单</button></div>`;
+  } else {
+    actions=`<p class="hint" id="plusPrev">${confirmed?"调整后":"确认后"}当前分 ${p.score} → ${next}。写入人员积分流水。</p>
+      <div class="foot">
+        ${confirmed?"":`<button class="btn ghost" onclick="applyTrainPlus('${c.id}',0)">不予加分</button>`}
+        <button class="btn" id="plusOk" onclick="submitTrainPlus('${c.id}')">${okLabel}</button>
+      </div>`;
+  }
+  return `<div class="detail-head">
+      <div class="avatar">${p.name.slice(-1)}</div>
+      <div class="grow"><div class="name">${p.name} · ${p.job}</div><div class="sub">${subName(p.sub)}</div></div>
+      <div class="score ${scoreCls(p.score)}">${p.score}</div>
+    </div>
+    <div class="kv">
+      <div class="row"><div class="k">课程</div><div class="v">${c.course}</div></div>
+      <div class="row"><div class="k">学时 / 考试</div><div class="v">${c.hours} 学时 · ${c.exam} 分　合格线 ${examPassLine()}　${pass?tagHtml("考试合格","ok"):tagHtml("未达合格线","danger")}</div></div>
+      <div class="row"><div class="k">完成日期</div><div class="v">${c.doneAt}</div></div>
+      <div class="row"><div class="k">建议加分</div><div class="v">${rules.plus} 分（首次合格，可改）</div></div>
+      <div class="row"><div class="k">确认加分</div><div class="v"><input class="num-in" id="plusVal" type="number" min="0" step="0.5" value="${currentPlus}" ${second||isCompany()?"disabled":""} oninput="previewTrainPlus('${c.id}')" /></div></div>
+      <div class="row"><div class="k">状态</div><div class="v">${tagHtml(c.status, confirmed?"ok":"warn")}</div></div>
+    </div>
+    ${second||isCompany()?"":`<p class="hint">${hint}</p>`}
+    ${actions}`;
+}
+function previewTrainPlus(cid){
+  const c=trainConfirms.find(x=>x.id===cid); if(!c) return;
+  const p=people.find(x=>x.id===c.pid); if(!p) return;
+  const n=Math.max(0, +($("#plusVal")&&$("#plusVal").value)||0);
+  const confirmed=c.status==="已确认";
+  const prev=confirmed?(+c.plus||0):0;
+  const next=+(p.score+(n-prev)).toFixed(1);
+  const el=$("#plusPrev");
+  if (el) el.textContent=`${confirmed?"调整后":"确认后"}当前分 ${p.score} → ${next}。写入人员积分流水。`;
+  const ok=$("#plusOk");
+  if (ok && !confirmed) ok.textContent=n>0?`确认加 ${n} 分并复工`:"确认不加分并复工";
+}
+function submitTrainPlus(cid){
+  applyTrainPlus(cid, +($("#plusVal")&&$("#plusVal").value)||0);
+}
+function applyTrainPlus(cid, plus){
+  if (isCompany()){ toast("公司层不能确认加分"); return; }
+  const c=trainConfirms.find(x=>x.id===cid); if(!c) return;
+  const p=people.find(x=>x.id===c.pid); if(!p) return;
+  if ((p.trainCount||0)>=2){ askBL(p.id); return; }
+  const n=Math.max(0, +(+plus||0).toFixed(1));
+  const was=c.status==="已确认";
+  const prev=was?(+c.plus||0):0;
+  const delta=+(n-prev).toFixed(1);
+  if (delta) p.score=+(p.score+delta).toFixed(1);
+  const verb=was?`再次调整加分为 ${n} 分`:(n>0?`确认加分 ${n} 分`:"确认不加分");
+  p.logs.unshift({t:today(), d:`停工培训人工${verb}。劳务教育《${c.course}》考试 ${c.exam} 分。`});
+  c.status="已确认"; c.plus=n;
+  toast(was? p.name+" 加分已调整为 "+n+" 分" : (n>0? p.name+" 已确认加 "+n+" 分" : p.name+" 已确认不加分"));
+  render();
+}
+
+function renderBL(){
+  const peopleRows = personBL.filter(x=>!x.removed && (isCompany()||x.project===CURRENT_PROJECT) && (!qBl || (x.name+subName(x.sub)).includes(qBl)));
+  const subRows = subBL.filter(x=>!x.removed && (isCompany()||x.project===CURRENT_PROJECT) && (!qBl || (x.name||"").includes(qBl)));
+  return `<div class="seg"><b class="${blTab==="p"?"on":""}" onclick="blTab='p';render()">人员</b><b class="${blTab==="s"?"on":""}" onclick="blTab='s';render()">分包商</b></div>
+    <div class="search-bar">${ic("search")}<input placeholder="${blTab==="p"?"姓名 / 分包商":"分包商名称"}" value="${qBl}" oninput="qBl=this.value;render()" /></div>
+    <p class="hint">黑名单范围为工程公司，项目端可查阅本项目相关对象。</p>
+    <div class="card" style="margin:0 12px">${
+      blTab==="p"
+        ? (peopleRows.map(x=>{
+            const pid=x.pid || (people.find(p=>p.name===x.name)||{}).id || "";
+            return `<div class="list-item" onclick="openPerson('${pid}','bl')">
+            <div class="avatar">${x.name.slice(-1)}</div>
+            <div class="grow">
+              <div class="name">${x.name} · ${x.job}</div>
+              <div class="sub">${subName(x.sub)} · ${x.project}<br>${x.rule} · ${x.time}</div>
+            </div>
+            ${tagHtml("黑名单","danger")}${ic("chev")}
+          </div>`;
+          }).join("") || `<div class="empty">无匹配人员</div>`)
+        : (subRows.map(x=>{
+            const sid=x.sid || (subs.find(s=>s.name===x.name)||{}).id || "";
+            return `<div class="list-item" onclick="openSub('${sid}','bl')">
+            <div class="avatar sub">${(x.name||"分").slice(0,1)}</div>
+            <div class="grow">
+              <div class="name">${x.name}</div>
+              <div class="sub">${x.rule} · ${x.reason}<br>${x.time}</div>
+            </div>
+            ${tagHtml("黑名单","danger")}${ic("chev")}
+          </div>`;
+          }).join("") || `<div class="empty">无匹配分包商</div>`)
+    }</div>`;
+}
+function monthSnap(){
+  const raw=snaps[snapMonth];
+  if (!raw) return {subs:[], people:[]};
+  const peopleRows=(raw.people||[]).map(row=>{
+    const p=people.find(x=>x.name===row.n && (!row.proj || x.project===row.proj));
+    return {
+      id:p?p.id:"",
+      n:row.n, s:row.s, st:row.st,
+      job:row.job || (p?p.job:""),
+      sub:row.sub || (p?subName(p.sub):""),
+      proj:row.proj || (p&&p.project) || CURRENT_PROJECT
+    };
+  }).filter(p=>isCompany() || p.proj===CURRENT_PROJECT);
+  const subRows=(raw.subs||[]).map(s=>{
+    const found=subs.find(x=>x.name===s.n);
+    return {
+      id:found?found.id:"",
+      n:s.n, s:s.s, st:s.st,
+      extra:found?found.lead:"",
+      proj:s.proj||CURRENT_PROJECT,
+      projs:found?Object.keys(found.projects||{}):[s.proj||CURRENT_PROJECT]
+    };
+  });
+  return {subs:subRows, people:peopleRows};
+}
+function filteredSnapSubs(snap){
+  const q=snapQ.trim();
+  return (snap.subs||[]).filter(s=>{
+    if (q && !(s.n+(s.extra||"")).includes(q)) return false;
+    if (isCompany() && snapProj!=="all" && !(s.projs||[]).includes(snapProj)) return false;
+    return true;
+  });
+}
+function filteredSnapPeople(snap){
+  const q=snapQ.trim();
+  return (snap.people||[]).filter(p=>{
+    if (q && !(p.n+(p.sub||"")+(p.job||"")).includes(q)) return false;
+    if (snapJob!=="all" && p.job!==snapJob) return false;
+    if (isCompany() && snapProj!=="all" && (p.proj||"")!==snapProj) return false;
+    return true;
+  });
+}
+function renderMonth(){
+  const company=isCompany();
+  const snap=monthSnap();
+  const jobs=[...new Set((snap.people||[]).map(p=>p.job).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"zh"));
+  if (snapJob!=="all" && !jobs.includes(snapJob)) snapJob="all";
+  const list=snapTab==="s"?filteredSnapSubs(snap):filteredSnapPeople(snap);
+  const empty=snapTab==="s"
+    ? (snap.subs.length?"无匹配分包商":"该月无分包商快照")
+    : (snap.people.length?"无匹配人员":"该月无人员快照");
+  return `<div class="month-pick" onclick="pickMonth()">${snapMonth} 月快照（${25} 日锁定）${ic("chev")}</div>
+    <div class="seg"><b class="${snapTab==="s"?"on":""}" onclick="snapTab='s';render()">分包商</b><b class="${snapTab==="p"?"on":""}" onclick="snapTab='p';render()">作业人员</b></div>
+    <div class="search-bar">${ic("search")}<input placeholder="${snapTab==="s"?"搜索分包商":"搜索姓名 / 分包商"}" value="${snapQ}" oninput="snapQ=this.value;render()" /></div>
+    ${company?`<div class="month-pick" onclick="pickSnapProj()">${projLabel(snapProj)}${ic("chev")}</div>`:""}
+    ${snapTab==="p"?`<div class="month-pick" onclick="pickSnapJob()">${snapJob==="all"?"全部工种":snapJob}${ic("chev")}</div>`:""}
+    <p class="hint">快照锁定当月累计分，账户不清零。${company?"公司层可按项目筛选全部样本。":""}</p>
+    <div class="card" style="margin:0 12px">${
+      ((snapTab==="s"
+        ? list.map(x=>{
+            const projText=(x.projs&&x.projs.length?x.projs.join("、"):x.proj)||"-";
+            return `<div class="list-item"${x.id?` onclick="openSub('${x.id}','month')"`:""}><div class="grow"><div class="name">${x.n}</div><div class="sub">${company?projText:CURRENT_PROJECT}</div></div><div class="score ${scoreCls(x.s)}">${x.s}</div>${tagHtml(x.st,x.st==="正常"?"ok":"warn")}${x.id?ic("chev"):""}</div>`;
+          }).join("")
+        : list.map(x=>{
+            const stCls=x.st==="正常"?"ok":x.st.includes("停工")||x.st.includes("黑名单")?"danger":"warn";
+            return `<div class="list-item"${x.id?` onclick="openPerson('${x.id}','month')"`:""}><div class="grow"><div class="name">${x.n} · ${x.job||""}</div><div class="sub">${x.sub||""}${company?" · "+(x.proj||""):""}</div></div><div class="score ${scoreCls(x.s)}">${x.s}</div>${tagHtml(x.st,stCls)}${x.id?ic("chev"):""}</div>`;
+          }).join(""))
+      || `<div class="empty">${empty}</div>`)
+    }</div>`;
+}
+function pickMonth(){
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    ${Object.keys(snaps).map(k=>`<div class="opt ${snapMonth===k?"on":""}" onclick="snapMonth='${k}';snapQ='';snapJob='all';closeSheet();render()">${k}</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function pickSnapProj(){
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt ${snapProj==="all"?"on":""}" onclick="snapProj='all';closeSheet();render()">全部项目</div>
+    ${allProjects().map(p=>`<div class="opt ${snapProj===p?"on":""}" onclick="snapProj='${p}';closeSheet();render()">${p}</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+function pickSnapJob(){
+  const jobs=[...new Set((monthSnap().people||[]).map(p=>p.job).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"zh"));
+  openSheet(`<div class="box" onclick="event.stopPropagation()"><div class="handle"></div>
+    <div class="opt ${snapJob==="all"?"on":""}" onclick="snapJob='all';closeSheet();render()">全部工种</div>
+    ${jobs.map(j=>`<div class="opt ${snapJob===j?"on":""}" onclick="snapJob='${j}';closeSheet();render()">${j}</div>`).join("")}
+    <div class="opt cancel" onclick="closeSheet()">取消</div></div>`);
+}
+
+function renderStub(){
+  return `<div class="empty">暂无内容</div>`;
+}
+
+function render(){
+  renderNav();
+  const page = stack[stack.length-1];
+  const map = {home:renderHome, task:renderStub, shot:renderStub, stats:renderStub, proj:renderStub, dash:renderDash, points:renderPoints, todo:renderTodo, files:renderFiles, person:renderPerson, archive:renderArchive, sub:renderSub, subinfo:renderSubInfo, train:renderTrain, bl:renderBL, blp:renderBLPerson, bls:renderBLSub, month:renderMonth, kpi:renderKpi};
+  $("#stage").innerHTML = `<div class="view active">${(map[page]||renderHome)()}</div>`;
+  renderActs();
+}
+render();
+</script>
+</body>
+</html>

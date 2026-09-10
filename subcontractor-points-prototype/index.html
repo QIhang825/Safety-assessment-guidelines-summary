@@ -1,0 +1,2878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>分包商安全积分考核 — 数字项目管理平台</title>
+<style>
+:root {
+  --primary:#268DFF; --primary-hover:#1A7AE8; --nav-bg:#002266;
+  --page-bg:#F2F2F2; --header-bg:#F3F3F3; --border:#E8E8E8; --divider:#D9D9D9;
+  --text-important:#333333; --text-default:#666666; --text-secondary:#999999;
+  --text-disabled:#BFBFBF; --link:#268DFF; --tag-blue:#1890FF;
+  --danger:#FF4141; --warn:#F77112; --success:#11BC11; --gray-dot:#CCCCCC;
+  --split:#C8E2FA; --radius:4px;
+  --font:"PingFang SC","Microsoft YaHei",sans-serif;
+  --num-font:Roboto,"DIN Alternate",Arial,sans-serif;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:var(--font); font-size:14px; line-height:22px; color:var(--text-default); background:var(--page-bg); min-width:1280px; }
+button,input,select,textarea { font-family:inherit; font-size:14px; }
+a { color:var(--link); cursor:pointer; text-decoration:none; }
+
+.primary-nav { height:48px; background:var(--nav-bg); display:flex; align-items:center; justify-content:space-between; padding:0 16px 0 8px; color:#fff; position:sticky; top:0; z-index:100; }
+.nav-left { display:flex; align-items:center; gap:8px; height:48px; }
+.logo-mark { width:28px; height:28px; border-radius:4px; background:linear-gradient(180deg,#2B98FF,#0167FF); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+.brand { font-size:16px; font-weight:500; margin-right:24px; }
+.nav-items { display:flex; height:48px; }
+.nav-item { padding:0 16px; height:47px; display:flex; align-items:center; color:rgba(255,255,255,.85); cursor:pointer; position:relative; white-space:nowrap; }
+.nav-item:hover { color:#fff; background:rgba(255,255,255,.06); }
+.nav-item.active { color:#fff; }
+.nav-item.active::after { content:""; position:absolute; left:16px; right:16px; bottom:0; height:3px; background:var(--primary); border-radius:2px 2px 0 0; }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.role-sel { height:28px; min-width:148px; background:#001A4D; color:#fff; border:1px solid rgba(255,255,255,.25); border-radius:4px; padding:0 8px; }
+.badge { min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#FA2A31; color:#fff; font-size:12px; line-height:18px; text-align:center; cursor:pointer; }
+.avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#8FC5FF,#268DFF); }
+
+.secondary-nav { height:40px; background:#fff; border-bottom:1px solid var(--border); display:flex; align-items:center; padding-left:16px; gap:24px; position:sticky; top:48px; z-index:90; overflow-x:auto; }
+.sec-item { height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; color:var(--text-default); position:relative; white-space:nowrap; border:0; background:transparent; }
+.sec-item:hover,.sec-item.active { color:var(--primary); }
+.sec-item.active::after { content:""; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:56px; max-width:100%; height:2px; background:var(--primary); }
+.sec-item.hide { display:none; }
+
+.page-wrap { padding:16px; min-height:calc(100vh - 88px); }
+.content-card { background:#fff; min-height:calc(100vh - 120px); padding:20px 24px 16px; }
+.view { display:none; } .view.active { display:block; }
+
+.toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:12px; flex-wrap:wrap; }
+.toolbar .hint-pill { flex:1; white-space:normal; }
+.toolbar-left,.toolbar-right { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.toolbar-left { flex:1; min-width:0; }
+.toolbar-right { flex-shrink:0; margin-left:auto; }
+.search-box { width:280px; height:32px; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; display:flex; align-items:center; background:#fff; }
+.search-box input { flex:1; border:none; outline:none; color:var(--text-important); background:transparent; width:100%; }
+.search-box input::placeholder { color:var(--text-secondary); }
+.select-box { height:32px; border:1px solid var(--border); border-radius:var(--radius); padding:0 8px; color:var(--text-important); background:#fff; min-width:120px; }
+
+.btn { height:32px; border-radius:var(--radius); padding:0 16px; display:inline-flex; align-items:center; justify-content:center; gap:4px; border:1px solid transparent; cursor:pointer; white-space:nowrap; }
+.btn:active { transform:translateY(1px); }
+.btn-primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+.btn-primary:hover { background:var(--primary-hover); }
+.btn-default { background:#fff; color:var(--text-default); border-color:var(--border); }
+.btn-default:hover { color:var(--primary); border-color:var(--primary); }
+.btn-link { background:transparent; border:none; color:var(--link); padding:0 4px; height:auto; }
+.btn-danger-text { background:transparent; border:none; color:var(--danger); padding:0 4px; height:auto; }
+
+.table-wrap { width:100%; overflow:auto; border:1px solid var(--border); }
+table.data-table { width:100%; border-collapse:collapse; }
+.data-table th,.data-table td { height:48px; padding:4px 16px; border:1px solid var(--border); text-align:left; vertical-align:middle; }
+.data-table th { background:var(--header-bg); color:var(--text-important); font-weight:500; white-space:nowrap; }
+.data-table td { background:#fff; color:var(--text-important); }
+.data-table td.act-cell { white-space:nowrap; }
+#view-hazards .data-table { table-layout:fixed; }
+#view-hazards .data-table th,
+#view-hazards .data-table td { padding:4px 10px; }
+#view-hazards .data-table td:nth-child(4),
+#view-hazards .data-table td:nth-child(5),
+#view-hazards .data-table td:nth-child(6) { white-space:normal; }
+#view-hazards .data-table th:last-child,
+#view-hazards .data-table td.act-cell { width:88px; position:sticky; right:0; z-index:1; box-shadow:-8px 0 8px -8px rgba(0,0,0,.18); }
+#view-hazards .data-table th:last-child { background:var(--header-bg); z-index:2; }
+.data-table td.cell-reason { max-width:280px; white-space:normal; }
+button.btn-link:disabled, button.btn-danger-text:disabled { opacity:.4; cursor:not-allowed; pointer-events:none; }
+.data-table tr:hover td { background:#F7FBFF; }
+.data-table tr.clickable { cursor:pointer; }
+.data-table th.chk, .data-table td.chk { width:44px; text-align:center; padding-left:8px; padding-right:8px; }
+.data-table td.chk { cursor:default; }
+.row-chk, #workerCheckAll, #subCheckAll, #blpCheckAll, #blsCheckAll { width:16px; height:16px; accent-color:var(--primary); cursor:pointer; }
+.muted { color:var(--text-secondary); font-size:12px; line-height:18px; }
+.name-link { color:var(--link); cursor:pointer; font-weight:500; background:none; border:none; padding:0; height:auto; font-size:14px; line-height:22px; }
+.name-link:hover { text-decoration:underline; color:var(--primary-hover); }
+
+.status-tag { display:inline-flex; align-items:center; gap:6px; }
+.dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.dot-blue { background:var(--primary); } .dot-red { background:var(--danger); }
+.dot-gray { background:var(--gray-dot); } .dot-green { background:var(--success); }
+.dot-orange { background:var(--warn); }
+
+.pagination { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:16px; height:28px; color:var(--text-default); }
+.page-btn,.page-num { min-width:28px; height:28px; border:1px solid var(--border); border-radius:var(--radius); background:#fff; display:inline-flex; align-items:center; justify-content:center; padding:0 6px; }
+.page-num.active { border-color:var(--tag-blue); color:var(--tag-blue); }
+
+.cfg-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.cfg-card { border:1px solid var(--border); border-radius:var(--radius); padding:16px; }
+.cfg-card h3 { font-size:14px; color:var(--text-important); font-weight:500; margin-bottom:12px; display:flex; justify-content:space-between; }
+.cfg-card h3 span { font-size:12px; color:var(--primary); font-weight:400; }
+.form-row { display:flex; margin-bottom:12px; align-items:center; }
+.form-label { width:168px; color:var(--text-default); flex-shrink:0; }
+.form-control { flex:1; }
+.input,.textarea { width:100%; border:1px solid var(--border); border-radius:var(--radius); padding:5px 8px; color:var(--text-important); outline:none; }
+.input { height:32px; }
+.textarea { min-height:72px; resize:vertical; }
+.input:focus,.textarea:focus,.select-box:focus { border-color:var(--primary); }
+.hint { color:var(--text-secondary); font-size:12px; margin-top:8px; }
+.hint-pill { display:inline-flex; align-items:center; padding:6px 12px; line-height:20px; background:#F0F7FF; border:1px solid #D6E9FF; border-radius:var(--radius); color:#1A6BBF; font-size:12px; }
+
+.tabs-inner { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:16px; }
+.tab-inner { padding:8px 16px; cursor:pointer; color:var(--text-default); border:0; background:transparent; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.tab-inner.active { color:var(--primary); border-bottom-color:var(--primary); font-weight:500; }
+
+.kpi-banner { background:linear-gradient(90deg,#FAFDFF 6%,rgba(226,241,255,.8) 65%,#F8FCFF 87%); border:1px solid #E6F0FA; padding:16px 24px 20px; margin-bottom:16px; }
+.kpi-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.card-title { font-size:14px; font-weight:500; color:var(--text-important); }
+.kpi-row { display:flex; align-items:center; gap:24px; }
+.kpi-item { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; cursor:pointer; padding:8px 12px; border-radius:4px; }
+.kpi-item:hover { background:rgba(38,141,255,.08); }
+.kpi-item:hover .kpi-label { color:var(--primary); }
+.kpi-item:hover .kpi-unit::after { content:" · 点击下穿"; color:var(--primary); }
+.kpi-label { font-size:14px; }
+.kpi-num { font-family:var(--num-font); font-size:36px; line-height:40px; font-weight:900; color:var(--text-important); }
+.kpi-unit { font-size:12px; color:var(--text-secondary); }
+.kpi-divider { width:1px; height:56px; background:var(--split); }
+.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.chart-card { background:#fff; border:1px solid var(--border); padding:16px; min-height:280px; }
+.chart-head { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:32px; }
+.group-row td { background:var(--header-bg); color:var(--text-important); font-weight:500; }
+.is-hide { display:none !important; }
+.donut-wrap { display:flex; align-items:center; justify-content:center; gap:32px; margin-top:8px; min-height:240px; }
+.donut-svg { flex-shrink:0; }
+.donut-center { font-family:var(--num-font); font-size:28px; font-weight:900; fill:var(--text-important); }
+.donut-center-sub { font-size:12px; fill:var(--text-secondary); }
+.donut-legend { display:flex; flex-direction:column; gap:10px; min-width:168px; }
+.legend-item { display:flex; align-items:center; gap:8px; color:var(--text-important); font-size:13px; width:100%; }
+.legend-swatch { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.legend-val { margin-left:auto; font-family:var(--num-font); color:var(--text-secondary); }
+.line-chart { width:100%; height:248px; margin-top:8px; display:block; }
+.rank-no { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:4px; font-family:var(--num-font); font-size:12px; font-weight:700; background:#F3F3F3; color:var(--text-default); }
+.rank-no.gold { background:#FAAD14; color:#fff; }
+.rank-no.silver { background:#8C8C8C; color:#fff; }
+.rank-no.bronze { background:#D48806; color:#fff; }
+
+.alert-bar { background:#FFF7E6; border:1px solid #FFE0A3; color:#AD6800; padding:8px 12px; border-radius:var(--radius); margin-bottom:16px; }
+.steps { display:flex; gap:8px; flex-wrap:wrap; }
+.steps span { font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:2px; color:var(--text-secondary); }
+.steps span.on { color:var(--primary); border-color:var(--primary); font-weight:500; }
+.steps span.done { color:var(--success); border-color:#B7E3B7; background:#F6FFF6; }
+.preview { margin-top:10px; padding:10px 12px; background:#F0F7FF; border:1px solid #D6E9FF; border-radius:var(--radius); color:#1A6BBF; }
+.timeline { border-left:2px solid var(--border); margin:8px 0 0 8px; padding-left:14px; }
+.tl { margin-bottom:12px; }
+.tl time { display:block; color:var(--text-secondary); font-size:12px; }
+.doc { border:1px solid #D9D9D9; padding:16px; background:#FAFAFA; }
+.doc h4 { text-align:center; margin:0 0 12px; color:var(--text-important); }
+.doc table,.doc td { border:1px solid #D9D9D9; }
+.doc td { padding:8px 10px; height:auto; }
+details { border-bottom:1px solid var(--border); padding:10px 0; }
+details summary { cursor:pointer; color:var(--text-important); }
+.off { color:var(--text-secondary); }
+
+.mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:none; align-items:center; justify-content:center; }
+.mask.show { display:flex; }
+.modal { width:720px; max-width:92vw; max-height:86vh; background:#fff; border-radius:var(--radius); display:flex; flex-direction:column; box-shadow:0 8px 24px rgba(0,0,0,.15); }
+.modal.wide { width:960px; }
+.modal-ft.is-hide { display:none; }
+.desc-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.desc-table td { border:1px solid var(--border); padding:4px 16px; height:48px; vertical-align:middle; }
+.desc-table td.k { width:142px; background:var(--header-bg); color:var(--text-default); }
+.desc-table td.v { color:var(--text-important); background:#fff; }
+.desc-table td.tall { height:auto; min-height:48px; padding:12px 16px; }
+.hz-sec { font-size:16px; font-weight:600; color:var(--text-important); margin:0 0 8px; }
+.hz-flow { position:relative; padding-left:24px; margin-top:16px; }
+.hz-flow::before { content:""; position:absolute; left:7px; top:10px; bottom:8px; width:2px; background:var(--border); }
+.hz-flow-item { position:relative; margin-bottom:16px; }
+.hz-flow-item:last-child { margin-bottom:0; }
+.hz-dot { position:absolute; left:-24px; top:4px; width:16px; height:16px; border-radius:50%; background:var(--primary); }
+.hz-photos { display:flex; gap:8px; flex-wrap:wrap; padding:8px 0; }
+.hz-photo { width:80px; height:80px; background:var(--header-bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:12px; }
+.modal-hd { height:48px; padding:0 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); color:var(--text-important); font-weight:500; }
+.modal-bd { padding:20px 20px 28px; overflow:auto; flex:1; }
+.modal-ft { padding:12px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:12px; }
+.close-x { cursor:pointer; color:var(--text-secondary); font-size:18px; border:none; background:none; }
+.toast { position:fixed; top:72px; left:50%; transform:translateX(-50%) translateY(-12px); background:rgba(0,0,0,.78); color:#fff; padding:8px 16px; border-radius:var(--radius); z-index:300; opacity:0; pointer-events:none; transition:.2s; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+.arch-back { color:var(--text-default); font-size:14px; }
+.arch-back:hover { color:var(--primary); }
+.arch-sep { color:var(--text-secondary); margin:0 8px; }
+.arch-basic { display:flex; gap:24px; align-items:stretch; margin-bottom:24px; }
+.arch-basic .desc-table { flex:1; min-width:0; }
+.arch-media { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
+.arch-media-item { display:flex; flex-direction:column; gap:4px; color:var(--text-secondary); font-size:12px; }
+.arch-photo { width:96px; height:120px; border:1px solid var(--border); background:linear-gradient(180deg,#E8F3FF,#F5F8FC); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:28px; font-weight:700; }
+.arch-idcard { width:132px; height:84px; border:1px solid var(--border); background:#F7F7F7; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:12px; }
+.arch-sign { height:36px; min-width:96px; display:inline-block; vertical-align:middle; }
+.arch-table td.k { width:168px; white-space:nowrap; }
+.arch-file { color:var(--link); cursor:pointer; margin-right:8px; }
+#view-archive .data-table { min-width:1100px; }
+.sub-info-head { display:flex; align-items:center; gap:8px; margin:0 0 16px; color:var(--text-important); font-size:16px; font-weight:600; }
+.sub-info-more { margin-left:auto; background:none; border:none; color:var(--primary); cursor:pointer; font-size:14px; font-weight:400; }
+.sub-info-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px 32px; }
+.sub-field .sub-k { color:var(--text-secondary); font-size:12px; line-height:20px; }
+.sub-field .sub-v { color:var(--text-important); min-height:22px; word-break:break-all; }
+.sub-info-block { margin-bottom:28px; }
+@media (max-width:1100px){ .sub-info-grid { grid-template-columns:1fr 1fr; } }
+@media (max-width:1400px){ .cfg-grid,.charts-row { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header class="primary-nav">
+  <div class="nav-left">
+    <div class="logo-mark">数</div>
+    <div class="brand">数字项目管理平台</div>
+    <div class="nav-items">
+      <div class="nav-item">首页</div>
+      <div class="nav-item">目标职责</div>
+      <div class="nav-item">组织机构人员</div>
+      <div class="nav-item active">制度化管理</div>
+      <div class="nav-item">通知公告</div>
+      <div class="nav-item">危大管控</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <select class="role-sel" id="roleSel">
+      <option value="project">项目安全员</option>
+      <option value="lead">项目领导小组</option>
+      <option value="company">工程公司安监</option>
+      <option value="committee">安委会</option>
+    </select>
+    <span class="badge" id="todoCount" title="待办">0</span>
+    <span class="avatar" title="当前用户"></span>
+  </div>
+</header>
+
+<nav class="secondary-nav" id="secNav">
+  <button class="sec-item active" data-page="dashboard" id="navDash">项目看板</button>
+  <button class="sec-item nav-p" data-page="workers">作业人员积分</button>
+  <button class="sec-item nav-p" data-page="hazards">检查隐患</button>
+  <button class="sec-item nav-p" data-page="training">停工培训确认</button>
+  <button class="sec-item" data-page="subs">分包商积分</button>
+  <button class="sec-item" data-page="monthly">月度考核</button>
+  <button class="sec-item" data-page="master">进场账户</button>
+  <button class="sec-item" data-page="rules">规则配置</button>
+  <button class="sec-item nav-c" data-page="company">公司汇总</button>
+  <button class="sec-item" data-page="blacklist">黑名单库</button>
+</nav>
+
+<main class="page-wrap">
+  <section class="view active" id="view-dashboard">
+    <div class="kpi-banner">
+      <div class="kpi-head"><div class="card-title" id="dashTitle">分包商安全积分 · 工作台</div><span class="hint-pill" id="dashHint">F8.1 项目看板</span></div>
+      <div class="kpi-row">
+        <div class="kpi-item" data-kpi="proj" id="kpiProjItem" title="查看在建项目明细"><div class="kpi-label">在建项目数量</div><div class="kpi-num" id="kProj">0</div><div class="kpi-unit" id="kProjUnit">个</div></div>
+        <div class="kpi-divider" id="kpiProjDiv"></div>
+        <div class="kpi-item" data-kpi="sub" title="查看在场分包商明细"><div class="kpi-label">在场分包商数量</div><div class="kpi-num" id="kSub">0</div><div class="kpi-unit" id="kSubUnit">家</div></div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-item" data-kpi="people" title="查看在场人员明细"><div class="kpi-label">在场人员数量</div><div class="kpi-num" id="kPeople">0</div><div class="kpi-unit" id="kPeopleUnit">人</div></div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-item" data-kpi="vio" title="查看本月违章人员明细"><div class="kpi-label">月度违章人数</div><div class="kpi-num" id="kVio">0</div><div class="kpi-unit" id="kVioUnit">本月涉及违规</div></div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-item" data-kpi="train" title="查看停工培训人员明细"><div class="kpi-label">停工培训人数</div><div class="kpi-num" id="kTrain">0</div><div class="kpi-unit" id="kTrainUnit">人</div></div>
+        <div class="kpi-divider"></div>
+        <div class="kpi-item" data-kpi="bl" title="查看黑名单对象明细"><div class="kpi-label">黑名单对象</div><div class="kpi-num" id="kBl">0</div><div class="kpi-unit" id="kBlUnit">人员及分包商</div></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-head">
+          <div class="card-title">人员分值分布</div>
+          <select class="select-box is-hide" id="donutProject"></select>
+        </div>
+        <div class="donut-wrap" id="scoreDonut"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-head">
+          <div class="card-title">违规人数月度折线图</div>
+          <select class="select-box is-hide" id="vioProject"></select>
+        </div>
+        <svg class="line-chart" id="vioLine" viewBox="0 0 520 248" role="img" aria-label="近6个月违规人数"></svg>
+      </div>
+    </div>
+    <div class="charts-row" style="margin-top:16px" id="rankRow">
+      <div class="chart-card" id="personRankCard">
+        <div class="card-title">TOP10 人员积分排名</div>
+        <div class="table-wrap" style="margin-top:12px;border:0">
+          <table class="data-table">
+            <thead><tr><th>排名</th><th>人员姓名</th><th>工种</th><th>所属劳务公司</th><th>人员积分</th></tr></thead>
+            <tbody id="top10Body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chart-card" id="subRankCard">
+        <div class="card-title" id="subRankTitle">分包商积分排名</div>
+        <div class="table-wrap" style="margin-top:12px;border:0">
+          <table class="data-table">
+            <thead id="subRankHead"><tr><th>排名</th><th>分包商</th><th>现场负责人</th><th>在场人数</th><th>本项目积分</th><th>状态</th></tr></thead>
+            <tbody id="subRankBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-kpiDetail">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn btn-default" id="kpiBack">返回项目看板</button>
+          <div class="card-title" id="kpiDetailTitle">下穿详情</div>
+          <select class="select-box is-hide" id="kpiProjFilter"></select>
+        </div>
+        <div class="toolbar-right"><span class="muted">共 <b id="kpiDetailN">0</b> 条</span></div>
+      </div>
+      <p class="hint-pill" id="kpiDetailHint" style="margin-bottom:12px"></p>
+      <div class="table-wrap"><table class="data-table">
+        <thead id="kpiDetailHead"></thead>
+        <tbody id="kpiDetailBody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-workers">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="search-box"><input id="workerQ" placeholder="搜索姓名 / 分包商 / 工种" /></div>
+          <select class="select-box" id="workerFilter"><option value="all">全部状态</option><option value="warn">重点管控</option><option value="train">停工培训</option><option value="out">清退</option></select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-default" id="btnExportWorkers">导出积分台账</button>
+          <button class="btn btn-primary" id="btnDeduct">人员违章记分</button>
+        </div>
+      </div>
+      <p class="hint-pill" style="margin-bottom:12px">F3.3 累计计分至退场，不按月清零。点击姓名查看劳务教育档案；操作列仅保留积分明细与处置动作。</p>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th class="chk"><input type="checkbox" id="workerCheckAll" title="全选当前列表" /></th><th>姓名</th><th>分包商</th><th>当前分</th><th>状态</th><th>进场日期</th><th>最近流水</th><th>操作</th></tr></thead>
+        <tbody id="workerTbody"></tbody>
+      </table></div>
+      <div class="pagination"><span>共 <b id="workerN">0</b> 条</span><span class="page-btn">5条/页</span><span class="page-btn">‹</span><span class="page-num active">1</span><span class="page-btn">›</span></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-archive">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn-link arch-back" id="archiveBack">‹ 返回</button>
+          <span class="arch-sep">|</span>
+          <div class="card-title">详情</div>
+        </div>
+      </div>
+      <div class="tabs-inner" id="archiveTabs">
+        <button class="tab-inner active" data-arch="info">人员信息</button>
+        <button class="tab-inner" data-arch="cert">人员证书</button>
+        <button class="tab-inner" data-arch="train">培训记录</button>
+      </div>
+      <p class="hint-pill" style="margin-bottom:16px">人员教育档案由劳务教育同步，只读查看进场基本信息、证书与三级教育记录。</p>
+      <div id="archiveBody"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-hazards">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left"><div class="card-title">检查扣分明细</div></div>
+        <div class="toolbar-right"><span class="muted">共 <b id="hzN">0</b> 条</span></div>
+      </div>
+      <p class="hint-pill" style="margin-bottom:12px">安全检查 / 隐患排查在源头按映射条款直接扣分后同步至此。本页只查看已入分详情，无需二次确认。未映射项与 E 类警告不进入本列表。</p>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>检查来源</th><th>检查日期</th><th>人员</th><th>工种 / 班组</th><th>所属劳务公司</th><th>扣分条款</th><th>已扣分</th><th>当前分</th><th>入分状态</th><th>操作</th></tr></thead>
+        <tbody id="hzTbody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-training">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select class="select-box" id="trainFilter">
+            <option value="all">全部</option>
+            <option value="wait">待确认加分</option>
+            <option value="doing">培训进行中</option>
+            <option value="done">已确认</option>
+          </select>
+        </div>
+        <div class="toolbar-right"><button class="btn btn-primary" id="btnSyncTrain">从劳务教育同步成绩</button></div>
+      </div>
+      <p class="hint-pill" style="margin-bottom:12px">人员在劳务教育完成停工教育后，学习内容与考试成绩同步至本页。项目对照成绩人工确认是否加分，建议分值确认时及确认后均可再调。第二次停工培训不可复岗加分。</p>
+      <div class="table-wrap"><table class="data-table">
+        <thead id="trainHead"></thead>
+        <tbody id="taskTbody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-subs">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left"><div class="search-box"><input id="subQ" placeholder="搜索分包商" /></div></div>
+        <div class="toolbar-right">
+          <button class="btn btn-default" id="btnExportSubs">导出积分台账</button>
+          <button class="btn btn-default" id="btnArt14">列入黑名单</button>
+          <button class="btn btn-primary" id="btnEval">人工评价</button>
+        </div>
+      </div>
+      <p class="hint-pill" style="margin-bottom:12px">点击分包商名称查看基本信息；操作列「明细」查看积分台账。勾选或表头全选后可导出积分列表与积分明细。</p>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th class="chk"><input type="checkbox" id="subCheckAll" title="全选当前列表" /></th><th>分包商</th><th>本项目分</th><th>人员联动</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="subTbody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-subInfo">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn-link arch-back" id="subInfoBack">‹ 返回</button>
+          <span class="arch-sep">|</span>
+          <div class="card-title" id="subInfoTitle">分包商</div>
+        </div>
+      </div>
+      <div class="tabs-inner" id="subInfoTabs">
+        <button class="tab-inner active" data-subtab="base">基本信息</button>
+        <button class="tab-inner" data-subtab="bank">银行信息</button>
+        <button class="tab-inner" data-subtab="qual">企业资质</button>
+        <button class="tab-inner" data-subtab="people">相关人员</button>
+        <button class="tab-inner" data-subtab="proj">项目履历</button>
+      </div>
+      <p class="hint-pill" style="margin-bottom:16px">分包商基本信息由劳务教育 / 供应商库同步，本页只读。</p>
+      <div id="subInfoBody"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-monthly">
+    <div class="content-card">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="card-title" id="snapTitle">月度考核快照</div>
+          <select class="select-box" id="snapMonthSel"></select>
+        </div>
+        <div class="toolbar-right"><span class="muted" id="snapMeta"></span></div>
+      </div>
+      <p class="hint-pill" style="margin-bottom:12px" id="snapHint">系统按规则配置的考核节点自动锁定当时累计分与状态，不重置账户。到达节点后生成当月快照，可切换历史月份查看。</p>
+      <div class="tabs-inner" id="snapTabs">
+        <button class="tab-inner active" data-snap="s">分包商</button>
+        <button class="tab-inner" data-snap="p">人员</button>
+      </div>
+      <div class="toolbar is-hide" id="snapFilterBar" style="margin-bottom:12px">
+        <div class="toolbar-left">
+          <div class="search-box"><input id="snapQ" placeholder="搜索分包商" /></div>
+          <select class="select-box is-hide" id="snapJob"></select>
+          <select class="select-box is-hide" id="snapProj"></select>
+        </div>
+      </div>
+      <div id="snapBox" class="hint" style="padding:24px 0;text-align:center">尚未到达考核节点。</div>
+    </div>
+  </section>
+
+  <section class="view" id="view-master">
+    <div class="content-card">
+      <p class="hint-pill" style="margin-bottom:16px">基础分包商与人员来自劳务教育模块，本页不办理进场登记和三级教育。退场冻结后不参与积分考核；重新进场后恢复参与，历史分与流水保留。</p>
+      <div class="toolbar">
+        <div class="toolbar-left"><div class="card-title">分包商积分账户</div></div>
+        <div class="toolbar-right"><button class="btn btn-primary" id="btnSyncSub">从劳务教育同步分包商</button></div>
+      </div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>分包商</th><th>现场负责人</th><th>当前分</th><th>状态</th><th>进场日期</th><th>考核参与</th><th>操作</th></tr></thead>
+        <tbody id="acctSubTbody"></tbody>
+      </table></div>
+      <div class="toolbar" style="margin-top:24px">
+        <div class="toolbar-left"><div class="card-title">人员积分账户</div></div>
+        <div class="toolbar-right"><button class="btn btn-primary" id="btnSyncPerson">从劳务教育同步人员</button></div>
+      </div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>姓名</th><th>工种 / 班组</th><th>所属劳务公司</th><th>当前分</th><th>状态</th><th>进场日期</th><th>考核参与</th><th>操作</th></tr></thead>
+        <tbody id="acctPersonTbody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-rules">
+    <div class="content-card">
+      <div class="tabs-inner" id="ruleTabs">
+        <button class="tab-inner active" data-tab="grade">人员预警分级</button>
+        <button class="tab-inner" data-tab="plus">加分规则</button>
+        <button class="tab-inner" data-tab="snap">月度考核节点</button>
+        <button class="tab-inner" data-tab="link">人员联动扣分</button>
+        <button class="tab-inner" data-tab="pstd">人员违章库</button>
+        <button class="tab-inner" data-tab="sstd">分包商标准库</button>
+        <button class="tab-inner" data-tab="card">灰黄红牌参照</button>
+        <button class="tab-inner" data-tab="map">隐患映射</button>
+      </div>
+      <div id="ruleBody"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-company">
+    <div class="content-card">
+      <div class="card-title" style="margin-bottom:12px">工程公司 · 分包商跨项目平均分</div>
+      <p class="hint-pill" style="margin-bottom:12px">F7.1 公司层按各项目当前分算术平均，支持下穿。黑名单按规则直接列入，标识不受平均分影响。</p>
+      <div id="companyBody"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-blacklist">
+    <div class="content-card">
+      <div class="tabs-inner" id="blTabs">
+        <button class="tab-inner active" data-bl="p">人员黑名单</button>
+        <button class="tab-inner" data-bl="s">分包商黑名单</button>
+      </div>
+      <div id="blPersonBox">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input id="blpQ" placeholder="搜索姓名 / 分包商" /></div>
+            <select class="select-box" id="blpJob"></select>
+            <select class="select-box is-hide" id="blpProj"></select>
+          </div>
+          <div class="toolbar-right"><button class="btn btn-default" id="btnExportBlPerson">导出人员黑名单台账</button></div>
+        </div>
+        <p class="hint" id="blPersonHint" style="margin:0 0 12px">按规则自动列入，无审核流转。</p>
+        <div class="table-wrap"><table class="data-table">
+          <thead id="blpHead"></thead>
+          <tbody id="blpTbody"></tbody>
+        </table></div>
+      </div>
+      <div id="blSubBox" style="display:none">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-box"><input id="blsQ" placeholder="搜索分包商" /></div>
+            <select class="select-box" id="blsRule"></select>
+            <select class="select-box is-hide" id="blsProj"></select>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-default" id="btnExportBlSub">导出分包商黑名单台账</button>
+            <button class="btn btn-primary" id="btnSubBL">直接列入</button>
+          </div>
+        </div>
+        <p class="hint" id="blSubHint" style="margin:0 0 12px">按规则直接列入，无审核流转。</p>
+        <div class="table-wrap"><table class="data-table">
+          <thead id="blsHead"></thead>
+          <tbody id="blsTbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="mask" id="mask">
+  <div class="modal" id="modalBox">
+    <div class="modal-hd"><span id="modalTitle">确认</span><button class="close-x" id="modalClose">×</button></div>
+    <div class="modal-bd" id="modalBody"></div>
+    <div class="modal-ft" id="modalFoot"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const toast = (m) => { const t=$("#toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 2400); };
+const openMask = () => $("#mask").classList.add("show");
+const closeMask = () => $("#mask").classList.remove("show");
+const today = () => new Date().toISOString().slice(0,10);
+const plusDays = (n) => { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const stHtml = (st, cls) => {
+  const dot = cls==="danger"?"dot-red":cls==="warn"?"dot-orange":cls==="ok"?"dot-green":"dot-gray";
+  return `<span class="status-tag"><i class="dot ${dot}"></i>${st}</span>`;
+};
+
+let role="project", page="dashboard", kpiKind="sub", kpiProj="all", dashProject="all", lineProject="all", archiveId="", archiveTab="info", subInfoId="", subInfoTab="base", subInfoMore=true, ruleTab="grade", blTab="p", blpQ="", blpJob="all", blpProj="all", blsQ="", blsRule="all", blsProj="all", snapMonth="", snapTab="s", snapQ="", snapJob="all", snapProj="all";
+const workerSel=new Set();
+const subSel=new Set();
+const blPersonSel=new Set();
+const blSubSel=new Set();
+const CURRENT_PROJECT="雄忻3标";
+const isCompany = () => role==="company"||role==="committee";
+const rules = { warn:90, learn:85, train:80, out:70, plus:10, days:7, linkBl:1, linkTrain:0.5, linkVio:0.1, snapDay:25 };
+let clauses = [
+  {id:"A1", obj:"p", name:"A类 · 营业线无计划作业", score:10, on:true},
+  {id:"B3", obj:"p", name:"B类 · 酒后上岗", score:8, on:true},
+  {id:"C2", obj:"p", name:"C类 · 未按规定佩戴防护", score:5, on:true},
+  {id:"D1", obj:"p", name:"D类 · 临电私拉乱接", score:2, on:true},
+  {id:"E1", obj:"p", name:"E类 · 班前会缺席", score:0, on:true},
+  {id:"S14-1", obj:"s14", name:"第十四条 · 伪造资质或安全资料", score:0, on:true},
+  {id:"S14-2", obj:"s14", name:"第十四条 · 发生一般及以上生产安全事故", score:0, on:true},
+  {id:"S15-3", obj:"s", name:"第十五条 · 无证特种作业", score:10, on:true},
+  {id:"S16-2", obj:"s", name:"第十六条 · 隐患未按期整改", score:5, on:true},
+  {id:"GRAY-1", obj:"card", name:"灰牌参照 · 未正确佩戴劳保", score:1, on:true},
+  {id:"YEL-8", obj:"card", name:"黄牌参照 · 危大作业未审批", score:5, on:true},
+  {id:"RED-6", obj:"card", name:"红牌参照 · 营业线侵限", score:10, on:true}
+];
+let maps = [
+  {id:"m1", hz:"临边防护缺失", clause:"C2"},
+  {id:"m2", hz:"无计划上道", clause:"A1"},
+  {id:"m3", hz:"班前会缺席", clause:"E1"},
+  {id:"m4", hz:"酒后上岗", clause:"B3"},
+  {id:"m5", hz:"临电私拉乱接", clause:"D1"}
+];
+let subs = [
+  {id:"s1", name:"保定冀铁劳务有限公司", lead:"曹卫东", legal:"冀铁法人", score:86, link:1.2, status:"正常", inAt:"2026-03-01", frozen:false, projects:{"雄忻3标":86,"太焦接触网":78,"京唐站改":90},
+    links:[
+      {t:"2026-08-16", name:"高明", job:"电工", team:"电工班", project:"京唐站改", kind:"违规记分", reason:"酒后上岗", score:0.1},
+      {t:"2026-08-12", name:"马连成", job:"起重司索", team:"起重班", project:"雄忻3标", kind:"违规记分", reason:"未按规定佩戴防护", score:0.1},
+      {t:"2026-08-06", name:"李建军", job:"接触网工", team:"接触网二班", project:"太焦接触网", kind:"停工培训单", reason:"累计分低于停工培训线，下发停工培训通知书", score:0.5},
+      {t:"2026-08-06", name:"李建军", job:"接触网工", team:"接触网二班", project:"太焦接触网", kind:"违规记分", reason:"临电私拉乱接", score:0.1},
+      {t:"2026-07-09", name:"徐海龙", job:"架子工", team:"架子班", project:"太焦接触网", kind:"违规记分", reason:"未按规定佩戴防护", score:0.1},
+      {t:"2026-06-15", name:"郑国强", job:"混凝土工", team:"混凝土班", project:"雄忻3标", kind:"违规记分", reason:"未按规定佩戴防护", score:0.1},
+      {t:"2026-05-18", name:"马连成", job:"起重司索", team:"起重班", project:"雄忻3标", kind:"违规记分", reason:"起重作业未设专人指挥", score:0.1},
+      {t:"2026-04-28", name:"高明", job:"电工", team:"电工班", project:"京唐站改", kind:"违规记分", reason:"配电箱未关门上锁", score:0.1}
+    ],
+    logs:[{t:"2026-03-01", d:"领导小组批准进场，赋分 100"}]},
+  {id:"s2", name:"石家庄线桥劳务公司", lead:"田立军", legal:"线桥法人", score:93, link:0.2, status:"正常", inAt:"2026-04-12", frozen:false, projects:{"雄忻3标":93},
+    links:[
+      {t:"2026-08-18", name:"孙志强", job:"电工", team:"电工班", project:"雄忻3标", kind:"违规记分", reason:"酒后上岗", score:0.1},
+      {t:"2026-07-22", name:"吴海涛", job:"钢筋工", team:"钢筋班", project:"雄忻3标", kind:"违规记分", reason:"临电私拉乱接", score:0.1}
+    ],
+    logs:[{t:"2026-04-12", d:"领导小组批准进场，赋分 100"}]},
+  {id:"s3", name:"太原接触网劳务队", lead:"郭建华", legal:"太接法人", score:71, link:2.8, status:"黑名单", inAt:"2026-02-18", frozen:false, projects:{"雄忻3标":71,"大西高铁":68},
+    links:[
+      {t:"2026-08-21", name:"韩文斌", job:"防护员", team:"防护班", project:"雄忻3标", kind:"进入黑名单", reason:"无计划上道，低于 70 分待清退", score:1},
+      {t:"2026-08-21", name:"韩文斌", job:"防护员", team:"防护班", project:"雄忻3标", kind:"违规记分", reason:"无计划上道", score:0.1},
+      {t:"2026-08-20", name:"刘海波", job:"普工", team:"普工一班", project:"雄忻3标", kind:"停工培训单", reason:"无计划上道后低于停工培训线，下发停工培训通知书", score:0.5},
+      {t:"2026-08-20", name:"刘海波", job:"普工", team:"普工一班", project:"雄忻3标", kind:"违规记分", reason:"无计划上道", score:0.1},
+      {t:"2026-08-14", name:"杨晓东", job:"普工", team:"普工班", project:"大西高铁", kind:"进入黑名单", reason:"无计划上道，低于 70 分待清退", score:1},
+      {t:"2026-08-08", name:"冯志远", job:"普工", team:"普工二班", project:"雄忻3标", kind:"违规记分", reason:"酒后上岗", score:0.1}
+    ],
+    logs:[{t:"2026-08-22", d:"第十四条 · 伪造资质或安全资料，直接列入劳务分包商黑名单。被举报提供虚假特种作业证件。"},{t:"2026-02-18", d:"领导小组批准进场，赋分 100"}]}
+];
+let people = [
+  {id:"p1", name:"周建国", sub:"s1", job:"接触网工", team:"接触网一班", project:"雄忻3标", score:92, last:"无", trainCount:0, inAt:"2026-03-12", frozen:false, logs:[{t:"2026-03-12", d:"三级教育合格，赋分 100"}]},
+  {id:"p2", name:"马连成", sub:"s1", job:"起重司索", team:"起重班", project:"雄忻3标", score:87, last:"C2 -5", trainCount:0, inAt:"2026-03-20", frozen:false, logs:[{t:"2026-08-12", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p3", name:"孙志强", sub:"s2", job:"电工", team:"电工班", project:"雄忻3标", score:83, last:"B3 -8", trainCount:0, inAt:"2026-04-15", frozen:false, logs:[{t:"2026-08-18", d:"酒后上岗，扣 8 分"}]},
+  {id:"p4", name:"刘海波", sub:"s3", job:"普工", team:"普工一班", project:"雄忻3标", score:76, last:"A1 -10", trainCount:1, inAt:"2026-05-02", frozen:false, logs:[{t:"2026-08-20", d:"无计划上道，扣 10 分"}]},
+  {id:"p5", name:"韩文斌", sub:"s3", job:"防护员", team:"防护班", project:"雄忻3标", score:68, last:"已列入黑名单", trainCount:2, inAt:"2026-05-08", frozen:false, logs:[{t:"2026-08-21", d:"按规则列入人员黑名单：累计分低于清退线。无计划上道后累计 68 分，低于清退线 70 分；第二次停工培训"},{t:"2026-08-21", d:"无计划上道，扣 10 分，低于 70 分待清退"}]},
+  {id:"p6", name:"赵德福", sub:"s2", job:"焊工", team:"焊工班", project:"雄忻3标", score:95, last:"无", trainCount:0, inAt:"2026-03-05", frozen:false, logs:[{t:"2026-03-05", d:"三级教育合格，赋分 100"}]},
+  {id:"p7", name:"钱立新", sub:"s1", job:"架子工", team:"架子班", project:"雄忻3标", score:91, last:"无", trainCount:0, inAt:"2026-03-18", frozen:false, logs:[{t:"2026-03-18", d:"三级教育合格，赋分 100"}]},
+  {id:"p8", name:"吴海涛", sub:"s2", job:"钢筋工", team:"钢筋班", project:"雄忻3标", score:88, last:"D1 -2", trainCount:0, inAt:"2026-04-08", frozen:false, logs:[{t:"2026-07-22", d:"临电私拉乱接，扣 2 分"}]},
+  {id:"p9", name:"郑国强", sub:"s1", job:"混凝土工", team:"混凝土班", project:"雄忻3标", score:84, last:"C2 -5", trainCount:0, inAt:"2026-04-22", frozen:false, logs:[{t:"2026-06-15", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p10", name:"冯志远", sub:"s3", job:"普工", team:"普工二班", project:"雄忻3标", score:79, last:"B3 -8", trainCount:1, inAt:"2026-05-16", frozen:false, logs:[{t:"2026-08-08", d:"酒后上岗，扣 8 分"}]},
+  {id:"p11", name:"李建军", sub:"s1", job:"接触网工", team:"接触网二班", project:"太焦接触网", score:78, last:"D1 -2", trainCount:1, inAt:"2026-04-02", frozen:false, logs:[{t:"2026-08-06", d:"临电私拉乱接，扣 2 分"}]},
+  {id:"p12", name:"王志刚", sub:"s1", job:"焊工", team:"焊工班", project:"京唐站改", score:90, last:"无", trainCount:0, inAt:"2026-03-22", frozen:false, logs:[{t:"2026-03-22", d:"三级教育合格，赋分 100"}]},
+  {id:"p13", name:"陈福生", sub:"s3", job:"防护员", team:"防护一班", project:"大西高铁", score:72, last:"C2 -5", trainCount:1, inAt:"2026-05-10", frozen:false, logs:[{t:"2026-08-11", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p14", name:"杨晓东", sub:"s3", job:"普工", team:"普工班", project:"大西高铁", score:65, last:"已列入黑名单", trainCount:2, inAt:"2026-05-20", frozen:false, logs:[{t:"2026-08-14", d:"按规则列入人员黑名单：累计分低于清退线。无计划上道后累计 65 分，低于清退线 70 分；第二次停工培训"},{t:"2026-08-14", d:"无计划上道，扣 10 分，低于 70 分待清退"}]},
+  {id:"p15", name:"徐海龙", sub:"s1", job:"架子工", team:"架子班", project:"太焦接触网", score:88, last:"C2 -5", trainCount:0, inAt:"2026-04-18", frozen:false, logs:[{t:"2026-07-09", d:"未按规定佩戴防护，扣 5 分"}]},
+  {id:"p16", name:"高明", sub:"s1", job:"电工", team:"电工班", project:"京唐站改", score:83, last:"B3 -8", trainCount:0, inAt:"2026-04-25", frozen:false, logs:[{t:"2026-08-16", d:"酒后上岗，扣 8 分"}]}
+];
+const eduSubs = [
+  {id:"s1", name:"保定冀铁劳务有限公司", lead:"曹卫东", legal:"冀铁法人", inAt:"2026-03-01", projects:{"雄忻3标":86,"太焦接触网":78,"京唐站改":90}},
+  {id:"s2", name:"石家庄线桥劳务公司", lead:"田立军", legal:"线桥法人", inAt:"2026-04-12", projects:{"雄忻3标":93}},
+  {id:"s3", name:"太原接触网劳务队", lead:"郭建华", legal:"太接法人", inAt:"2026-02-18", projects:{"雄忻3标":71,"大西高铁":68}},
+  {id:"s4", name:"邯郸电力劳务有限公司", lead:"李卫国", legal:"邯电法人", inAt:"2026-08-20", projects:{"雄忻3标":100}}
+];
+const eduPeople = [
+  {id:"p17", name:"张宝国", sub:"s1", job:"电焊工", team:"焊工二班", project:"雄忻3标", inAt:"2026-08-22"},
+  {id:"p18", name:"刘长青", sub:"s1", job:"接触网工", team:"接触网三班", project:"太焦接触网", inAt:"2026-08-21"}
+];
+const eduTrain = [
+  {pid:"p4", course:"停工再教育 · 营业线作业纪律", hours:8, exam:86, doneAt:"2026-08-24", modules:["营业线防护","作业计划与命令","典型违章案例"]},
+  {pid:"p10", course:"停工再教育 · 作业纪律与酒后上岗", hours:8, exam:92, doneAt:"2026-08-25", modules:["劳动纪律","酒后上岗危害","复岗安全交底"]},
+  {pid:"p11", course:"停工再教育 · 临时用电与临电管理", hours:6, exam:74, doneAt:"2026-08-23", modules:["临电规程","配电箱管理","私拉乱接案例"]},
+  {pid:"p13", course:"停工再教育 · 个人防护与现场纪律", hours:8, exam:58, doneAt:"2026-08-22", modules:["防护用品佩戴","现场纪律","考核要点"]}
+];
+let trainConfirms = [
+  {id:"c1", pid:"p4", course:"停工再教育 · 营业线作业纪律", hours:8, exam:86, doneAt:"2026-08-24", modules:["营业线防护","作业计划与命令","典型违章案例"], suggest:10, plus:10, status:"待确认", trainNo:1}
+];
+let tasks = [
+  {id:"t1", pid:"p2", type:"learn", due:"2026-08-26", status:"进行中"},
+  {id:"t2", pid:"p3", type:"warn", due:"-", status:"已预警"},
+  {id:"t3", pid:"p4", type:"train", due:"2026-08-27", status:"待确认加分", notices:1},
+  {id:"t4", pid:"p5", type:"out", due:"-", status:"待清退"},
+  {id:"t5", pid:"p10", type:"train", due:"2026-08-28", status:"停工培训", notices:1},
+  {id:"t6", pid:"p11", type:"train", due:"2026-08-29", status:"停工培训", notices:1},
+  {id:"t7", pid:"p13", type:"train", due:"2026-08-30", status:"停工培训", notices:1},
+  {id:"t8", pid:"p14", type:"out", due:"-", status:"待清退"}
+];
+let hazards = [
+  {id:"h1", src:"隐患排查", title:"接触网作业未戴防护", pid:"p2", map:"m1", at:"2026-08-12", desc:"接触网作业未按规定佩戴安全帽及安全带，高处作业存在坠落风险。", inspector:"项目安全员：李强（13901110001）", fixer:"班组长：马连成", checkAt:"2026-08-14 10:20"},
+  {id:"h2", src:"安全检查", title:"酒后上岗", pid:"p3", map:"m4", at:"2026-08-18", desc:"现场检查发现酒后上岗，已立即停止作业并带离现场。", inspector:"安全总监：赵鹏（13901110002）", fixer:"现场负责人：田立军", checkAt:"2026-08-20 09:40"},
+  {id:"h3", src:"安全检查", title:"无计划上道作业", pid:"p4", map:"m2", at:"2026-08-20", desc:"无计划上道作业，未办理营业线施工手续，擅自进入防护区。", inspector:"安全总监：赵鹏（13901110002）", fixer:"现场负责人：郭建华", checkAt:"2026-08-22 15:10"},
+  {id:"h4", src:"安全检查", title:"无计划上道作业", pid:"p5", map:"m2", at:"2026-08-21", desc:"无计划上道作业，未设专职防护员，擅自进入营业线作业范围。", inspector:"项目安全员：李强（13901110001）", fixer:"现场负责人：郭建华", checkAt:"2026-08-23 11:00"},
+  {id:"h5", src:"班组检查", title:"临电私拉乱接", pid:"p8", map:"m5", at:"2026-07-22", desc:"临电线路私拉乱接，配电箱未关门上锁。", inspector:"安全员：周敏（13901110003）", fixer:"班组长：吴海涛", checkAt:"2026-07-24 16:30"},
+  {id:"h6", src:"隐患排查", title:"未按规定佩戴防护", pid:"p9", map:"m1", at:"2026-06-15", desc:"混凝土作业未按规定佩戴防护用品。", inspector:"项目安全员：李强（13901110001）", fixer:"班组长：郑国强", checkAt:"2026-06-17 09:15"},
+  {id:"h7", src:"安全检查", title:"酒后上岗", pid:"p10", map:"m4", at:"2026-08-08", desc:"班前检查发现酒后上岗，已停止当日作业。", inspector:"安全总监：赵鹏（13901110002）", fixer:"现场负责人：郭建华", checkAt:"2026-08-10 14:00"}
+];
+let personBL = [
+  {id:"pb1", pid:"p5", name:"韩文斌", job:"防护员", team:"防护班", project:"雄忻3标", sub:"s3", rule:"累计分低于清退线", reason:"无计划上道后累计 68 分，低于清退线 70 分；第二次停工培训", time:"2026-08-21", scoreAt:68, scope:"本工程公司范围", removed:false},
+  {id:"pb2", pid:"p14", name:"杨晓东", job:"普工", team:"普工班", project:"大西高铁", sub:"s3", rule:"累计分低于清退线", reason:"无计划上道后累计 65 分，低于清退线 70 分；第二次停工培训", time:"2026-08-14", scoreAt:65, scope:"本工程公司范围", removed:false}
+];
+let subBL = [
+  {id:"sb1", sid:"s3", rule:"第十四条", clause:"S14-1", reason:"伪造资质或安全资料。被举报提供虚假特种作业证件。", time:"2026-08-22", scoreAt:71, removed:false}
+];
+const vioHistory = {"2026-03":6,"2026-04":8,"2026-05":11,"2026-06":9,"2026-07":12};
+const vioHistoryCo = {"2026-03":14,"2026-04":18,"2026-05":21,"2026-06":16,"2026-07":22};
+const vioHistoryByProject = {
+  "雄忻3标":{"2026-03":8,"2026-04":10,"2026-05":12,"2026-06":8,"2026-07":11},
+  "太焦接触网":{"2026-03":2,"2026-04":3,"2026-05":4,"2026-06":3,"2026-07":5},
+  "京唐站改":{"2026-03":2,"2026-04":3,"2026-05":3,"2026-06":3,"2026-07":4},
+  "大西高铁":{"2026-03":2,"2026-04":2,"2026-05":2,"2026-06":2,"2026-07":2}
+};
+const histSnaps = {
+  "2026-03":{
+    subs:[{n:"保定冀铁劳务有限公司",s:100,st:"正常"},{n:"太原接触网劳务队",s:100,st:"正常"}],
+    people:[{n:"赵德福",s:100,st:"正常"},{n:"周建国",s:100,st:"正常"},{n:"钱立新",s:100,st:"正常"},{n:"马连成",s:100,st:"正常"},{n:"王志刚",s:100,st:"正常"}]
+  },
+  "2026-04":{
+    subs:[{n:"保定冀铁劳务有限公司",s:98,st:"正常"},{n:"石家庄线桥劳务公司",s:100,st:"正常"},{n:"太原接触网劳务队",s:96,st:"正常"}],
+    people:[{n:"赵德福",s:100,st:"正常"},{n:"周建国",s:100,st:"正常"},{n:"钱立新",s:100,st:"正常"},{n:"马连成",s:100,st:"正常"},{n:"孙志强",s:100,st:"正常"},{n:"吴海涛",s:100,st:"正常"},{n:"郑国强",s:100,st:"正常"},{n:"李建军",s:100,st:"正常"},{n:"徐海龙",s:100,st:"正常"},{n:"高明",s:100,st:"正常"},{n:"王志刚",s:100,st:"正常"}]
+  },
+  "2026-05":{
+    subs:[{n:"保定冀铁劳务有限公司",s:95,st:"正常"},{n:"石家庄线桥劳务公司",s:98,st:"正常"},{n:"太原接触网劳务队",s:90,st:"正常"}],
+    people:[{n:"赵德福",s:100,st:"正常"},{n:"周建国",s:98,st:"正常"},{n:"钱立新",s:100,st:"正常"},{n:"马连成",s:97,st:"正常"},{n:"孙志强",s:96,st:"正常"},{n:"吴海涛",s:100,st:"正常"},{n:"郑国强",s:100,st:"正常"},{n:"刘海波",s:100,st:"正常"},{n:"韩文斌",s:100,st:"正常"},{n:"冯志远",s:100,st:"正常"},{n:"李建军",s:94,st:"正常"},{n:"徐海龙",s:100,st:"正常"},{n:"高明",s:96,st:"正常"},{n:"王志刚",s:100,st:"正常"},{n:"陈福生",s:100,st:"正常"},{n:"杨晓东",s:100,st:"正常"}]
+  },
+  "2026-06":{
+    subs:[{n:"保定冀铁劳务有限公司",s:92,st:"正常"},{n:"石家庄线桥劳务公司",s:96,st:"正常"},{n:"太原接触网劳务队",s:84,st:"正常"}],
+    people:[{n:"赵德福",s:98,st:"正常"},{n:"周建国",s:96,st:"正常"},{n:"钱立新",s:98,st:"正常"},{n:"马连成",s:95,st:"正常"},{n:"孙志强",s:94,st:"正常"},{n:"吴海涛",s:98,st:"正常"},{n:"郑国强",s:95,st:"正常"},{n:"刘海波",s:92,st:"正常"},{n:"韩文斌",s:90,st:"正常"},{n:"冯志远",s:93,st:"正常"},{n:"李建军",s:90,st:"正常"},{n:"徐海龙",s:96,st:"正常"},{n:"高明",s:94,st:"正常"},{n:"王志刚",s:98,st:"正常"},{n:"陈福生",s:92,st:"正常"},{n:"杨晓东",s:88,st:"重点管控"}]
+  },
+  "2026-07":{
+    subs:[{n:"保定冀铁劳务有限公司",s:90,st:"正常"},{n:"石家庄线桥劳务公司",s:94,st:"正常"},{n:"太原接触网劳务队",s:78,st:"正常"}],
+    people:[{n:"赵德福",s:95,st:"正常"},{n:"周建国",s:92,st:"正常"},{n:"钱立新",s:91,st:"正常"},{n:"马连成",s:92,st:"正常"},{n:"孙志强",s:91,st:"正常"},{n:"吴海涛",s:88,st:"重点管控"},{n:"郑国强",s:84,st:"重点管控"},{n:"刘海波",s:86,st:"重点管控"},{n:"韩文斌",s:78,st:"停工培训"},{n:"冯志远",s:87,st:"重点管控"},{n:"李建军",s:80,st:"重点管控"},{n:"徐海龙",s:88,st:"重点管控"},{n:"高明",s:91,st:"正常"},{n:"王志刚",s:90,st:"正常"},{n:"陈福生",s:77,st:"停工培训"},{n:"杨晓东",s:75,st:"停工培训"}]
+  }
+};
+const subName = (id) => (subs.find(s=>s.id===id)||{}).name || "-";
+const clauseBy = (id) => clauses.find(c=>c.id===id);
+
+function pStatus(p){
+  if (p.frozen) return ["已退场冻结","warn"];
+  if (inPersonBL(p)) return ["清退/黑名单","danger"];
+  if (p.score<rules.train) return ["停工培训","danger"];
+  if (p.score<rules.warn) return ["重点管控","warn"];
+  return ["正常","ok"];
+}
+function sStatus(s){
+  if (inSubBL(s) || s.status==="黑名单") return ["黑名单","danger"];
+  return ["正常","ok"];
+}
+function inPersonBL(p){
+  return personBL.some(x=>!x.removed && (x.pid===p.id || x.name===p.name));
+}
+function inSubBL(s){
+  return subBL.some(x=>!x.removed && x.sid===s.id);
+}
+function personBLHit(p){
+  if (!p || p.frozen) return null;
+  if ((p.trainCount||0)>=2) return {rule:"二次停工培训", reason:`累计停工培训 ${p.trainCount} 次，按规定列入人员黑名单。当前分 ${p.score}`};
+  if (p.score<rules.out) return {rule:"累计分低于清退线", reason:`当前分 ${p.score}，低于清退线 ${rules.out} 分`};
+  return null;
+}
+function can(act){
+  if (act==="deduct"||act==="train"||act==="account") return role==="project"||role==="lead";
+  if (act==="admit"||act==="eval"||act==="art14") return role==="lead";
+  if (act==="blRemove") return role==="project"||role==="lead"||role==="company"||role==="committee";
+  if (act==="safety"||act==="biz") return role==="company";
+  if (act==="committee") return role==="committee";
+  return true;
+}
+function applyRoleNav(){
+  const company = isCompany();
+  $$(".nav-p").forEach(b=>b.classList.toggle("hide", company));
+  $$(".nav-c").forEach(b=>b.classList.toggle("hide", !company && role!=="lead"));
+  if (role==="lead") $$(".nav-c").forEach(b=>b.classList.remove("hide"));
+  $("#navDash").textContent=company?"公司看板":"项目看板";
+}
+function goto(next){
+  if (isCompany() && (next==="workers"||next==="training"||next==="hazards"||next==="archive")) next="dashboard";
+  page=next;
+  $$(".view").forEach(p=>p.classList.remove("active"));
+  $("#view-"+page).classList.add("active");
+  $$(".sec-item").forEach(b=>b.classList.toggle("active", b.dataset.page===page || (page==="kpiDetail" && b.dataset.page==="dashboard") || (page==="archive" && b.dataset.page==="workers") || (page==="subInfo" && b.dataset.page==="subs")));
+  render();
+}
+function pendingCount(){
+  return tasks.filter(t=>t.status!=="已完成").length;
+}
+function render(){
+  applyRoleNav();
+  renderDash(); renderKpiDetail(); renderWorkers(); renderArchive(); renderHazards(); renderTasks();
+  renderSubs(); renderSubInfo(); renderMonthly(); renderMaster(); renderRules(); renderCompany(); renderBL();
+  $("#todoCount").textContent = pendingCount();
+}
+function monthKey(d){ return (d||"").slice(0,7); }
+function last6MonthKeys(){
+  const now=new Date();
+  const out=[];
+  for(let i=5;i>=0;i--){
+    const x=new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const key=`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}`;
+    out.push({key, label:`${x.getMonth()+1}月`});
+  }
+  return out;
+}
+function currentMonthKey(){
+  const n=new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
+}
+function snapAt(key){
+  const [y,m]=key.split("-").map(Number);
+  const last=new Date(y, m, 0).getDate();
+  const d=Math.min(Math.max(1, rules.snapDay||25), last);
+  return `${key}-${String(d).padStart(2,"0")}`;
+}
+function monthDue(key){ return today()>=snapAt(key); }
+function monthLabel(key){
+  if (!key) return "";
+  return `${key.slice(0,4)} 年 ${parseInt(key.slice(5),10)} 月`;
+}
+function liveSnapPayload(){
+  const ps=people.filter(p=>!p.frozen && (isCompany() || p.project===CURRENT_PROJECT));
+  const ss=isCompany()?liveSubList():subProjectRows(CURRENT_PROJECT).map(r=>r.s);
+  return {
+    people:ps.map(p=>({id:p.id,n:p.name,s:p.score,st:pStatus(p)[0],extra:`${p.job} / ${p.team||"-"}`,proj:p.project||CURRENT_PROJECT,sub:p.sub})),
+    subs:ss.map(s=>({id:s.id,n:s.name,s:s.score,st:sStatus(s)[0],extra:`负责人 ${s.lead}`,proj:CURRENT_PROJECT,projs:Object.keys(s.projects||{})}))
+  };
+}
+function decorateSnapPerson(row){
+  const p=people.find(x=>x.name===row.n && (!row.proj || x.project===row.proj));
+  return {
+    id:p?p.id:"", n:row.n, s:row.s, st:row.st,
+    extra:row.extra || (p?`${p.job} / ${p.team||"-"}`:"-"),
+    proj:row.proj || (p&&p.project) || CURRENT_PROJECT,
+    sub:p?p.sub:""
+  };
+}
+function getSnap(key){
+  if (!key) return null;
+  if (key===currentMonthKey() && monthDue(key)) return {key, at:snapAt(key), auto:true, ...liveSnapPayload()};
+  const hist=histSnaps[key];
+  if (!hist) return null;
+  const peopleRows=hist.people.map(decorateSnapPerson).filter(p=>isCompany() || p.proj===CURRENT_PROJECT);
+  const subRows=(hist.subs||[]).map(s=>{
+    const found=subs.find(x=>x.name===s.n);
+    return {id:found?found.id:"", n:s.n,s:s.s,st:s.st,extra:found?`负责人 ${found.lead}`:(s.extra||"-"),proj:s.proj||CURRENT_PROJECT,projs:found?Object.keys(found.projects||{}):[s.proj||CURRENT_PROJECT]};
+  });
+  return {key, at:snapAt(key), auto:false, people:peopleRows, subs:subRows};
+}
+function allProjects(){
+  const set=new Set();
+  subs.forEach(s=>Object.keys(s.projects||{}).forEach(k=>set.add(k)));
+  people.forEach(p=>{ if(p.project) set.add(p.project); });
+  return [...set];
+}
+function inScopePerson(p, project){
+  if (p.frozen) return false;
+  if (project && project!=="all") return p.project===project;
+  if (isCompany()) return true;
+  return p.project===CURRENT_PROJECT;
+}
+function livePeopleList(project){ return people.filter(p=>inScopePerson(p, project)); }
+function liveSubList(){ return subs.filter(s=>!s.frozen); }
+function subProjectRows(project){
+  const rows=[];
+  liveSubList().forEach(s=>{
+    Object.entries(s.projects||{}).forEach(([proj,score])=>{
+      if (project && project!=="all" && proj!==project) return;
+      if (!isCompany() && proj!==CURRENT_PROJECT) return;
+      if (!isCompany() && project==="all" && proj!==CURRENT_PROJECT) return;
+      rows.push({s, project:proj, score});
+    });
+  });
+  return rows;
+}
+function monthVioPeople(key, project){
+  const k=(key||today()).slice(0,7);
+  return livePeopleList(project).filter(p=>(p.logs||[]).some(l=>(l.t||"").slice(0,7)===k && /扣/.test(l.d)));
+}
+function monthVioCount(key, project){
+  const k=(key||today()).slice(0,7);
+  const live=monthVioPeople(k, project).length;
+  if (k===today().slice(0,7)) return live;
+  if (project && project!=="all"){
+    const ph=vioHistoryByProject[project];
+    return ph && ph[k]!=null ? ph[k] : live;
+  }
+  const hist=isCompany()?vioHistoryCo:vioHistory;
+  return hist[k]!=null ? hist[k] : live;
+}
+function trainPeopleList(project){ return livePeopleList(project).filter(p=>pStatus(p)[0]==="停工培训"); }
+function blPeopleList(project){
+  return livePeopleList(project).filter(p=>inPersonBL(p));
+}
+function blSubList(project){
+  return liveSubList().filter(s=>{
+    if (!inSubBL(s) && s.status!=="黑名单") return false;
+    if (isCompany()){
+      if (project && project!=="all") return s.projects && s.projects[project]!=null;
+      return true;
+    }
+    return !s.projects || s.projects[CURRENT_PROJECT]!=null;
+  });
+}
+function projectStatRows(){
+  return allProjects().map(proj=>{
+    const plist=livePeopleList(proj);
+    const subsN=subProjectRows(proj).length;
+    return {
+      proj,
+      subN:subsN,
+      peopleN:plist.length,
+      vioN:monthVioPeople(today().slice(0,7), proj).length,
+      trainN:trainPeopleList(proj).length,
+      blN:blPeopleList(proj).length+blSubList(proj).length,
+      avg:plist.length?Math.round(plist.reduce((a,p)=>a+p.score,0)/plist.length):"-"
+    };
+  }).sort((a,b)=>a.proj.localeCompare(b.proj,"zh"));
+}
+function fillProjectSelect(sel, value, withAll){
+  if (!sel) return;
+  const opts=(withAll?[["all","全部项目"]]:[]).concat(allProjects().map(p=>[p,p]));
+  sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");
+  sel.value=opts.some(o=>o[0]===value)?value:(withAll?"all":CURRENT_PROJECT);
+}
+function groupedHtml(items, getProj, cols, rowHtml){
+  const map=new Map();
+  items.forEach(it=>{
+    const k=getProj(it);
+    if(!map.has(k)) map.set(k,[]);
+    map.get(k).push(it);
+  });
+  return [...map.entries()].map(([proj,list])=>`<tr class="group-row"><td colspan="${cols}">${proj}　${list.length} 条</td></tr>`+list.map(rowHtml).join("")).join("");
+}
+function renderDonut(el, segs){
+  const total=segs.reduce((a,s)=>a+s.value,0);
+  const r=64, circ=2*Math.PI*r, cx=90, cy=90;
+  let off=0;
+  const rings=segs.filter(s=>s.value>0).map(s=>{
+    const len=total? (s.value/total)*circ : 0;
+    const dash=`${len} ${circ-len}`;
+    const node=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="22" stroke-dasharray="${dash}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"></circle>`;
+    off+=len;
+    return node;
+  }).join("");
+  el.innerHTML=`<svg class="donut-svg" width="180" height="180" viewBox="0 0 180 180">
+      ${rings || `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E8E8E8" stroke-width="22"></circle>`}
+      <circle cx="${cx}" cy="${cy}" r="48" fill="#fff"></circle>
+      <text class="donut-center" x="${cx}" y="${cy+2}" text-anchor="middle">${total}</text>
+      <text class="donut-center-sub" x="${cx}" y="${cy+20}" text-anchor="middle">在场人员</text>
+    </svg>
+    <div class="donut-legend">${segs.map(s=>`<div class="legend-item"><i class="legend-swatch" style="background:${s.color}"></i><span>${s.label}</span><span class="legend-val">${s.value} 人</span></div>`).join("")}</div>`;
+}
+function renderLine(svg, series){
+  const w=520, h=248, pl=40, pr=16, pt=20, pb=36;
+  const iw=w-pl-pr, ih=h-pt-pb;
+  const max=Math.max(4, ...series.map(s=>s.n));
+  const step=Math.ceil(max/4)||1;
+  const yMax=step*4;
+  const xAt=i=>pl+(series.length<=1?iw/2:i*iw/(series.length-1));
+  const yAt=v=>pt+ih-(v/yMax)*ih;
+  const pts=series.map((s,i)=>`${xAt(i).toFixed(1)},${yAt(s.n).toFixed(1)}`).join(" ");
+  const grid=[0,1,2,3,4].map(i=>{
+    const y=yAt(i*step);
+    return `<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#E8E8E8"/><text x="${pl-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#999">${i*step}</text>`;
+  }).join("");
+  const labels=series.map((s,i)=>`<text x="${xAt(i)}" y="${h-12}" text-anchor="middle" font-size="12" fill="#666">${s.label}</text>`).join("");
+  const dots=series.map((s,i)=>`<circle cx="${xAt(i)}" cy="${yAt(s.n)}" r="4" fill="#268DFF" stroke="#fff" stroke-width="2"/><text x="${xAt(i)}" y="${yAt(s.n)-10}" text-anchor="middle" font-size="12" fill="#333" font-family="Roboto,Arial">${s.n}</text>`).join("");
+  svg.innerHTML=`${grid}<polyline fill="none" stroke="#268DFF" stroke-width="2" points="${pts}"/>${dots}${labels}`;
+}
+function renderDash(){
+  const company=isCompany();
+  const livePeople=livePeopleList();
+  const thisKey=today().slice(0,7);
+  const subN=company?liveSubList().length:subProjectRows(CURRENT_PROJECT).length;
+  const projN=allProjects().length;
+  $("#kProj").textContent=company?projN:1;
+  $("#kProjUnit").textContent=company?"个 · 下属项目":"个 · 本项目";
+  $("#kpiProjItem").classList.toggle("is-hide", !company);
+  $("#kpiProjDiv").classList.toggle("is-hide", !company);
+  $("#kSub").textContent=subN;
+  $("#kPeople").textContent=livePeople.length;
+  $("#kVio").textContent=monthVioCount(thisKey);
+  $("#kTrain").textContent=trainPeopleList().length;
+  $("#kBl").textContent=blPeopleList().length+blSubList().length;
+  $("#kSubUnit").textContent=company?`家 · ${allProjects().length} 个项目`:"家";
+  $("#kPeopleUnit").textContent=company?"人 · 下属全部项目":"人";
+  $("#kVioUnit").textContent=company?"本月全项目涉及违规":"本月涉及违规";
+  $("#kTrainUnit").textContent=company?"人 · 下属全部项目":"人";
+  $("#kBlUnit").textContent=company?"人员及分包商 · 各项目":"人员及分包商";
+  $("#dashTitle").textContent=company?"工程公司 · 公司看板":"分包商安全积分 · 工作台";
+  $("#dashHint").textContent=company?"F8.2 公司看板：跨项目汇总，不含人员实时预警名单":"F8.1 项目看板：人员预警仅项目可见";
+  const donutSel=$("#donutProject");
+  const vioSel=$("#vioProject");
+  donutSel.classList.toggle("is-hide", !company);
+  vioSel.classList.toggle("is-hide", !company);
+  if (company){
+    fillProjectSelect(donutSel, dashProject, true);
+    donutSel.onchange=()=>{ dashProject=donutSel.value; renderDash(); };
+    fillProjectSelect(vioSel, lineProject, true);
+    vioSel.onchange=()=>{ lineProject=vioSel.value; renderDash(); };
+  } else {
+    dashProject="all";
+    lineProject="all";
+  }
+  const donutPeople=livePeopleList(company?dashProject:undefined);
+  const dist=[
+    {label:"≥90 正常", value:donutPeople.filter(p=>p.score>=90).length, color:"#11BC11"},
+    {label:"85–89", value:donutPeople.filter(p=>p.score>=85&&p.score<90).length, color:"#268DFF"},
+    {label:"80–84", value:donutPeople.filter(p=>p.score>=80&&p.score<85).length, color:"#F77112"},
+    {label:"70–79 停工", value:donutPeople.filter(p=>p.score>=70&&p.score<80).length, color:"#FA541C"},
+    {label:"<70 清退", value:donutPeople.filter(p=>p.score<70).length, color:"#FF4141"}
+  ];
+  renderDonut($("#scoreDonut"), dist);
+  renderLine($("#vioLine"), last6MonthKeys().map(m=>({label:m.label, n:monthVioCount(m.key, company?lineProject:undefined)})));
+  $("#personRankCard").classList.toggle("is-hide", company);
+  $("#rankRow").style.gridTemplateColumns=company?"1fr":"";
+  $("#subRankTitle").textContent=company?"分包商积分排名":"分包商积分排名";
+  if (company){
+    $("#subRankHead").innerHTML="<tr><th>排名</th><th>分包商</th><th>所属项目</th><th>现场负责人</th><th>该项目在场人数</th><th>该项目积分</th><th>状态</th></tr>";
+    const rows=subProjectRows("all").slice().sort((a,b)=>b.score-a.score);
+    $("#subRankBody").innerHTML=rows.map((r,i)=>{
+      const cls=i===0?"gold":i===1?"silver":i===2?"bronze":"";
+      const [st,stCls]=sStatus(r.s);
+      const n=people.filter(p=>p.sub===r.s.id && !p.frozen && p.project===r.project).length;
+      return `<tr class="clickable" data-id="${r.s.id}"><td><span class="rank-no ${cls}">${i+1}</span></td><td>${r.s.name}</td><td>${r.project}</td><td>${r.s.lead}</td><td>${n}</td><td style="font-family:var(--num-font);font-weight:700">${r.score}</td><td>${stHtml(st,stCls)}</td></tr>`;
+    }).join("") || `<tr><td colspan="7" class="muted">暂无在场分包商</td></tr>`;
+  } else {
+    $("#subRankHead").innerHTML="<tr><th>排名</th><th>分包商</th><th>现场负责人</th><th>在场人数</th><th>本项目积分</th><th>状态</th></tr>";
+    const liveSubs=subProjectRows(CURRENT_PROJECT).map(r=>r.s);
+    const subRank=liveSubs.slice().sort((a,b)=>b.score-a.score);
+    $("#subRankBody").innerHTML=subRank.map((s,i)=>{
+      const cls=i===0?"gold":i===1?"silver":i===2?"bronze":"";
+      const [st,stCls]=sStatus(s);
+      const n=people.filter(p=>p.sub===s.id && !p.frozen && p.project===CURRENT_PROJECT).length;
+      return `<tr class="clickable" data-id="${s.id}"><td><span class="rank-no ${cls}">${i+1}</span></td><td>${s.name}</td><td>${s.lead}</td><td>${n}</td><td style="font-family:var(--num-font);font-weight:700">${s.score}</td><td>${stHtml(st,stCls)}</td></tr>`;
+    }).join("") || `<tr><td colspan="6" class="muted">暂无在场分包商</td></tr>`;
+  }
+  if (!company){
+    const top=livePeople.slice().sort((a,b)=>b.score-a.score).slice(0,10);
+    $("#top10Body").innerHTML=top.map((p,i)=>{
+      const cls=i===0?"gold":i===1?"silver":i===2?"bronze":"";
+      return `<tr class="clickable" data-id="${p.id}"><td><span class="rank-no ${cls}">${i+1}</span></td><td>${p.name}</td><td>${p.job}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td></tr>`;
+    }).join("") || `<tr><td colspan="5" class="muted">暂无在场人员</td></tr>`;
+    $$("#top10Body tr.clickable").forEach(tr=>tr.onclick=()=>openPerson(tr.dataset.id));
+  }
+  $$("#subRankBody tr.clickable").forEach(tr=>tr.onclick=()=>openSub(tr.dataset.id));
+  $$("#view-dashboard [data-kpi]").forEach(el=>el.onclick=()=>{ kpiKind=el.dataset.kpi; kpiProj="all"; goto("kpiDetail"); });
+}
+function renderKpiDetail(){
+  const company=isCompany();
+  const scope=company?kpiProj:"all";
+  const meta={
+    proj:{title:"在建项目数量", hint:company?"工程公司下属在建项目。点击行下穿该项目在场分包商。":"当前登录项目。"},
+    sub:{title:"在场分包商数量", hint:company?"按项目展开在场分包商。同一家单位在多个项目分别列出。":"本项目未退场冻结的劳务分包商。点击行查看台账。"},
+    people:{title:"在场人员数量", hint:company?"下属各项目在场作业人员，含工种、班组。可按项目筛选。":"本项目已建立积分账户且未退场冻结的作业人员。"},
+    vio:{title:"月度违章人数", hint:company?"各项目本月有 A–D 类扣分流水的人员，按人去重，含工种、班组。":"本月存在 A–D 类扣分流水的人员，按人去重。"},
+    train:{title:"停工培训人数", hint:company?"各项目当前处于停工培训的人员，含工种、班组。":"当前累计分低于停工培训线、尚未进入清退的人员。"},
+    bl:{title:"黑名单对象", hint:company?"各项目已列入人员黑名单与分包商黑名单，含所属项目。按规则直接列入，无审核流转。":"本项目已列入的人员与分包商。按积分或第十四条等规则直接列入，无审核流转。"}
+  }[kpiKind]||{title:"下穿详情", hint:""};
+  $("#kpiDetailTitle").textContent=meta.title;
+  $("#kpiDetailHint").textContent=meta.hint;
+  $("#kpiBack").textContent=company?"返回公司看板":"返回项目看板";
+  const filt=$("#kpiProjFilter");
+  filt.classList.toggle("is-hide", !company || kpiKind==="proj");
+  if (company){
+    fillProjectSelect(filt, kpiProj, true);
+    filt.onchange=()=>{ kpiProj=filt.value; renderKpiDetail(); };
+  }
+  const thisKey=today().slice(0,7);
+  const monthLabel=thisKey.slice(5).replace(/^0/,"")+" 月";
+  let head="", body="", n=0;
+  const showProj=company && kpiKind!=="proj";
+  if (kpiKind==="proj"){
+    const rows=projectStatRows();
+    n=rows.length;
+    head="<tr><th>项目</th><th>在场分包商</th><th>在场人员</th><th>本月违章</th><th>停工培训</th><th>黑名单对象</th><th>人员平均分</th></tr>";
+    body=rows.map(r=>`<tr class="clickable" data-kind="proj" data-id="${r.proj}"><td>${r.proj}</td><td>${r.subN} 家</td><td>${r.peopleN} 人</td><td>${r.vioN} 人</td><td>${r.trainN} 人</td><td>${r.blN}</td><td style="font-family:var(--num-font);font-weight:700">${r.avg}</td></tr>`).join("");
+    $("#kpiDetailHint").textContent=`下属在建项目 ${n} 个。点击行查看该项目在场分包商明细。`;
+  } else if (kpiKind==="sub"){
+    const rows=subProjectRows(scope);
+    n=company?liveSubList().length:rows.length;
+    if (company && scope!=="all") n=new Set(rows.map(r=>r.s.id)).size;
+    head=showProj?"<tr><th>所属项目</th><th>分包商</th><th>现场负责人</th><th>该项目在场人数</th><th>该项目积分</th><th>状态</th></tr>"
+      :"<tr><th>分包商</th><th>现场负责人</th><th>进场日期</th><th>在场人数</th><th>本项目积分</th><th>人员联动已扣</th><th>状态</th></tr>";
+    const rowHtml=r=>{
+      const [st,cls]=sStatus(r.s);
+      const pn=people.filter(p=>p.sub===r.s.id && !p.frozen && p.project===r.project).length;
+      return showProj
+        ? `<tr class="clickable" data-kind="s" data-id="${r.s.id}"><td>${r.project}</td><td>${r.s.name}</td><td>${r.s.lead}</td><td>${pn}</td><td style="font-family:var(--num-font);font-weight:700">${r.score}</td><td>${stHtml(st,cls)}</td></tr>`
+        : `<tr class="clickable" data-kind="s" data-id="${r.s.id}"><td>${r.s.name}</td><td>${r.s.lead}</td><td>${r.s.inAt}</td><td>${pn}</td><td style="font-family:var(--num-font);font-weight:700">${r.s.score}</td><td>已扣 ${subLinkTotal(r.s).toFixed(1)}</td><td>${stHtml(st,cls)}</td></tr>`;
+    };
+    body=showProj?groupedHtml(rows, r=>r.project, 6, rowHtml):rows.map(rowHtml).join("");
+    if (company) $("#kpiDetailHint").textContent=`公司范围 ${n} 家分包商，按项目展开 ${rows.length} 条在场记录。可筛选项目。`;
+  } else if (kpiKind==="people"){
+    const rows=livePeopleList(scope).slice().sort((a,b)=>(a.project||"").localeCompare(b.project||"")||a.name.localeCompare(b.name));
+    n=rows.length;
+    head=showProj?"<tr><th>所属项目</th><th>姓名</th><th>工种</th><th>班组</th><th>所属劳务公司</th><th>当前分</th><th>状态</th></tr>"
+      :"<tr><th>姓名</th><th>工种</th><th>班组</th><th>所属劳务公司</th><th>进场日期</th><th>当前分</th><th>状态</th></tr>";
+    const rowHtml=p=>{
+      const [st,cls]=pStatus(p);
+      return showProj
+        ? `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.project||"-"}</td><td>${p.name}</td><td>${p.job}</td><td>${p.team||"-"}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(st,cls)}</td></tr>`
+        : `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.name}</td><td>${p.job}</td><td>${p.team||"-"}</td><td>${subName(p.sub)}</td><td>${p.inAt}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(st,cls)}</td></tr>`;
+    };
+    body=showProj?groupedHtml(rows, p=>p.project, 7, rowHtml):rows.map(rowHtml).join("");
+  } else if (kpiKind==="vio"){
+    const rows=monthVioPeople(thisKey, scope);
+    n=rows.length;
+    head=showProj?"<tr><th>所属项目</th><th>姓名</th><th>工种</th><th>班组</th><th>所属劳务公司</th><th>本月违规日期</th><th>违规事实</th><th>当前分</th></tr>"
+      :"<tr><th>姓名</th><th>工种</th><th>班组</th><th>所属劳务公司</th><th>本月违规日期</th><th>违规事实</th><th>当前分</th><th>状态</th></tr>";
+    const rowHtml=p=>{
+      const log=(p.logs||[]).find(l=>monthKey(l.t)===thisKey && /扣/.test(l.d))||{};
+      const [st,cls]=pStatus(p);
+      return showProj
+        ? `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.project||"-"}</td><td>${p.name}</td><td>${p.job}</td><td>${p.team||"-"}</td><td>${subName(p.sub)}</td><td>${log.t||"-"}</td><td>${log.d||p.last}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td></tr>`
+        : `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.name}</td><td>${p.job}</td><td>${p.team||"-"}</td><td>${subName(p.sub)}</td><td>${log.t||"-"}</td><td>${log.d||p.last}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(st,cls)}</td></tr>`;
+    };
+    body=showProj?groupedHtml(rows, p=>p.project, 8, rowHtml):rows.map(rowHtml).join("");
+    $("#kpiDetailHint").textContent=`${monthLabel}${company?"各项目":""}有 A–D 类扣分流水的人员 ${n} 人，含工种、班组。点击行查看档案。`;
+  } else if (kpiKind==="train"){
+    const rows=trainPeopleList(scope);
+    n=rows.length;
+    head=showProj?"<tr><th>所属项目</th><th>姓名</th><th>工种</th><th>班组</th><th>所属劳务公司</th><th>当前分</th><th>培训期限</th><th>任务状态</th></tr>"
+      :"<tr><th>姓名</th><th>工种</th><th>班组</th><th>所属劳务公司</th><th>当前分</th><th>培训期限</th><th>通知书</th><th>任务状态</th><th>操作</th></tr>";
+    const rowHtml=p=>{
+      const t=tasks.find(x=>x.pid===p.id && x.type==="train" && x.status!=="已完成")||{};
+      return showProj
+        ? `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.project||"-"}</td><td>${p.name}</td><td>${p.job}</td><td>${p.team||"-"}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${t.due||"-"}</td><td>${stHtml(t.status||"停工培训","danger")}</td></tr>`
+        : `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.name}</td><td>${p.job}</td><td>${p.team||"-"}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${t.due||"-"}</td><td>第 ${t.notices||1} 次</td><td>${stHtml(t.status||"停工培训","danger")}</td><td class="act-cell"><button class="btn-link" data-jump="training">去确认加分</button></td></tr>`;
+    };
+    body=showProj?groupedHtml(rows, p=>p.project, 8, rowHtml):rows.map(rowHtml).join("");
+  } else {
+    const ps=blPeopleList(scope);
+    const ss=blSubList();
+    const sRows=ss.flatMap(s=>{
+      const projs=Object.keys(s.projects||{});
+      const list=(company?(scope==="all"?projs:projs.filter(p=>p===scope)):projs.filter(p=>p===CURRENT_PROJECT));
+      return list.map(proj=>({s, project:proj}));
+    });
+    n=ps.length+ss.length;
+    head=showProj?"<tr><th>所属项目</th><th>类型</th><th>对象</th><th>工种 / 班组</th><th>关联单位</th><th>当前分</th><th>列入原因 / 状态</th></tr>"
+      :"<tr><th>类型</th><th>对象</th><th>工种 / 班组</th><th>关联信息</th><th>当前分</th><th>列入原因 / 状态</th></tr>";
+    const pHtml=p=>{
+      const rec=personBL.find(x=>x.name===p.name);
+      const reason=rec?(rec.src+" · "+(rec.time||"")):(p.last||"待清退");
+      return showProj
+        ? `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>${p.project||"-"}</td><td>人员</td><td>${p.name}</td><td>${p.job} / ${p.team||"-"}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(pStatus(p)[0],"danger")} ${reason}</td></tr>`
+        : `<tr class="clickable" data-kind="p" data-id="${p.id}"><td>人员</td><td>${p.name}</td><td>${p.job} / ${p.team||"-"}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(pStatus(p)[0],"danger")} ${reason}</td></tr>`;
+    };
+    const sHtml=r=>showProj
+      ? `<tr class="clickable" data-kind="s" data-id="${r.s.id}"><td>${r.project}</td><td>分包商</td><td>${r.s.name}</td><td>负责人 ${r.s.lead}</td><td>—</td><td style="font-family:var(--num-font);font-weight:700">${r.s.projects[r.project]}</td><td>${stHtml("黑名单","danger")}</td></tr>`
+      : `<tr class="clickable" data-kind="s" data-id="${r.s.id}"><td>分包商</td><td>${r.s.name}</td><td>负责人 ${r.s.lead}</td><td>${CURRENT_PROJECT}</td><td style="font-family:var(--num-font);font-weight:700">${r.s.score}</td><td>${stHtml("黑名单","danger")}</td></tr>`;
+    if (showProj){
+      const mixed=[...ps.map(p=>({type:"p", project:p.project, p})), ...sRows.map(r=>({type:"s", project:r.project, r}))];
+      const map=new Map();
+      mixed.forEach(it=>{ if(!map.has(it.project)) map.set(it.project,[]); map.get(it.project).push(it); });
+      body=[...map.entries()].map(([proj,list])=>`<tr class="group-row"><td colspan="7">${proj}　${list.length} 条</td></tr>`+list.map(it=>it.type==="p"?pHtml(it.p):sHtml(it.r)).join("")).join("");
+    } else body=ps.map(pHtml).join("")+sRows.map(sHtml).join("");
+  }
+  $("#kpiDetailHead").innerHTML=head;
+  $("#kpiDetailBody").innerHTML=body || `<tr><td colspan="8" class="muted">暂无明细</td></tr>`;
+  $("#kpiDetailN").textContent=n;
+  $$("#kpiDetailBody tr.clickable").forEach(tr=>tr.onclick=e=>{
+    if (e.target.closest("[data-jump]")) return;
+    if (tr.dataset.kind==="proj"){ kpiKind="sub"; kpiProj=tr.dataset.id; renderKpiDetail(); return; }
+    if (tr.dataset.kind==="s") openSub(tr.dataset.id); else openPerson(tr.dataset.id);
+  });
+  $$("#kpiDetailBody [data-jump]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); goto(b.dataset.jump); });
+}
+function scoreLogsHtml(p, n){
+  const logs=(p.logs||[]).slice(0, n||5);
+  if (!logs.length) return `<p class="muted">暂无积分流水。</p>`;
+  return `<div class="timeline">${logs.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join("")}</div>`;
+}
+function workerVisibleRows(){
+  const q=($("#workerQ").value||"").trim();
+  const f=$("#workerFilter").value;
+  return livePeopleList().filter(p=>{
+    const st=pStatus(p)[0];
+    if (f==="warn" && st!=="重点管控") return false;
+    if (f==="train" && st!=="停工培训") return false;
+    if (f==="out" && st!=="清退/黑名单") return false;
+    return !q || (p.name+subName(p.sub)+p.job+(p.team||"")).includes(q);
+  });
+}
+function syncWorkerCheckAll(){
+  const boxes=$$("#workerTbody .row-chk");
+  const all=$("#workerCheckAll");
+  if (!all) return;
+  if (!boxes.length){ all.checked=false; all.indeterminate=false; return; }
+  const n=boxes.filter(b=>b.checked).length;
+  all.checked=n===boxes.length;
+  all.indeterminate=n>0 && n<boxes.length;
+}
+function seedNum(s, n){
+  let h=0;
+  for (const c of String(s)) h=(h*33+c.charCodeAt(0))>>>0;
+  return n?h%n:h;
+}
+function signMark(name){
+  return `<svg class="arch-sign" viewBox="0 0 120 36" aria-hidden="true"><text x="6" y="26" font-family="KaiTi,STKaiti,'PingFang SC',serif" font-size="18" fill="#333">${name||""}</text></svg>`;
+}
+function isSpecialJob(job){
+  return /焊工|电工|起重|接触网|架子/.test(job||"");
+}
+function personArchive(p){
+  const age=32+seedNum(p.id,20);
+  const birthY=2026-age;
+  const birthM=String(1+seedNum(p.id+"m",12)).padStart(2,"0");
+  const birthD=String(1+seedNum(p.id+"d",27)).padStart(2,"0");
+  const head=["130123","140105","130102","130184"][seedNum(p.id,4)];
+  const idNo=head+birthY+birthM+birthD+String(1000+seedNum(p.id+"i",8000)).slice(-4);
+  const pre=["138","139","150","182","187"][seedNum(p.id,5)];
+  const phone=pre+String(80000000+seedNum(p.id+"ph",19999999)).slice(-8);
+  const rel=["配偶","父子","兄弟"][seedNum(p.id,3)];
+  const emerg=rel==="配偶"?p.name[0]+"秀兰":rel==="父子"?p.name[0]+"卫国":p.name[0]+"卫东";
+  const emergPhone=["139","158","195"][seedNum(p.id,3)]+String(70000000+seedNum(p.id+"em",29999999)).slice(-8);
+  const addr={
+    "雄忻3标":"河北省保定市竞秀区建设南路 "+(12+seedNum(p.id,80))+" 号",
+    "太焦接触网":"山西省晋中市榆次区迎宾街 "+(8+seedNum(p.id,40))+" 号",
+    "京唐站改":"河北省唐山市路北区建设路 "+(20+seedNum(p.id,60))+" 号",
+    "大西高铁":"山西省太原市小店区平阳路 "+(16+seedNum(p.id,50))+" 号"
+  }[p.project||CURRENT_PROJECT]||"河北省保定市竞秀区建设南路 18 号";
+  const edu=["初中","高中","中专","技校"][seedNum(p.id,4)];
+  const special=isSpecialJob(p.job);
+  const certName={焊工:"熔化焊接与热切割作业",电工:"低压电工作业",起重司索:"起重司索作业",接触网工:"高压电工作业",架子工:"登高架设作业"}[p.job]||"";
+  const certs=[{name:"建筑施工从业人员考核合格证", no:"AQ"+p.id.toUpperCase()+"-2026", org:"项目安全教育管理机构", from:plusDaysFrom(p.inAt,-6), to:"2029-12-31"}];
+  if (special && certName) certs.unshift({name:certName, no:"T"+p.id.toUpperCase()+"-2024", org:"应急管理厅", from:"2024-03-01", to:"2030-03-01"});
+  const score=function(key, base){ return base+seedNum(p.id+key, 8); };
+  const trains=[
+    {theme:`班组级入场教育（${(p.inAt||"").replace(/-/g,"")}）`, type:"入场三级教育", edu:"班组级入场教育", from:plusDaysFrom(p.inAt,-2), to:p.inAt, hours:20, score:score("tb",90)},
+    {theme:`项目级入场教育（${plusDaysFrom(p.inAt,-4).replace(/-/g,"")}）`, type:"入场三级教育", edu:"项目级入场教育", from:plusDaysFrom(p.inAt,-4), to:plusDaysFrom(p.inAt,-2), hours:15, score:score("tp",88)},
+    {theme:`公司级入场教育（${plusDaysFrom(p.inAt,-7).replace(/-/g,"")}）`, type:"入场三级教育", edu:"公司级入场教育", from:plusDaysFrom(p.inAt,-7), to:plusDaysFrom(p.inAt,-4), hours:24, score:score("tc",92)}
+  ].map(r=>({...r, project:p.project||CURRENT_PROJECT, status:"已完成", result:r.score>=60?"及格":"不及格"}));
+  if ((p.trainCount||0)>0){
+    trains.unshift({theme:"停工复岗教育", type:"停工培训", edu:"停工复岗教育", project:p.project||CURRENT_PROJECT, from:plusDaysFrom(today(),-rules.days), to:today(), hours:16, status:"已完成", score:score("tt",86), result:"及格"});
+  }
+  const reports=[`tj-${p.id}-1.jpg`];
+  if (seedNum(p.id,2)) reports.push(`tj-${p.id}-2.jpg`);
+  return {
+    sex:"男", phone, phoneShow:phone.slice(0,3)+"****"+phone.slice(-4),
+    idNo, idShow:idNo.slice(0,6)+"********"+idNo.slice(-4),
+    birth:`${birthY}-${birthM}-${birthD}`, age, nation:"汉", edu,
+    emerg, emergPhone, emergShow:emergPhone.slice(0,3)+"****"+emergPhone.slice(-4), rel, addr,
+    special, certs, trains, reports,
+    contract:seedNum(p.id,3)?"劳务合同.pdf":""
+  };
+}
+function openArchive(id){
+  archiveId=id;
+  archiveTab="info";
+  goto("archive");
+}
+function renderArchive(){
+  const p=people.find(x=>x.id===archiveId);
+  $$("#archiveTabs .tab-inner").forEach(b=>b.classList.toggle("active", b.dataset.arch===archiveTab));
+  const box=$("#archiveBody");
+  if (!p){ box.innerHTML=`<p class="muted">未选择人员。</p>`; return; }
+  const a=personArchive(p);
+  if (archiveTab==="info"){
+    box.innerHTML=`
+      <div class="hz-sec">基本信息</div>
+      <div class="arch-basic">
+        <table class="desc-table arch-table">
+          ${descRow("姓名", p.name, "性别", a.sex)}
+          ${descRow("联系电话", a.phoneShow, "身份证号", a.idShow)}
+          ${descRow("出生日期", a.birth, "年龄", a.age+" 岁")}
+          ${descRow("民族", a.nation, "学历", a.edu)}
+          ${descRow("紧急联系人", a.emerg, "紧急联系人电话", a.emergShow)}
+          ${descRow("与本人关系", a.rel, "家庭住址", a.addr)}
+        </table>
+        <aside class="arch-media">
+          <div class="arch-media-item"><div class="arch-photo">${p.name.slice(0,1)}</div>近照</div>
+          <div class="arch-media-item"><div class="arch-idcard">身份证人像面</div>身份证正面</div>
+          <div class="arch-media-item"><div class="arch-idcard">身份证国徽面</div>身份证反面</div>
+        </aside>
+      </div>
+      <div class="hz-sec">工作信息</div>
+      <table class="desc-table arch-table">
+        ${descRow("所属公司", subName(p.sub), "所属班组", p.team||"-")}
+        ${descRow("工种", p.job, "是否特种人员", a.special?"是":"否")}
+        ${descRow("进场日期", p.inAt, "是否专职安全生产管理人员", "否")}
+        ${descRow("手签", signMark(p.name), "岗位", "分包作业人员")}
+        ${descFull("体检报告", a.reports.map(f=>`<span class="arch-file" data-file="${f}">${f}</span>`).join("") || "--")}
+        ${descFull("合同", a.contract?`<span class="arch-file" data-file="${a.contract}">${a.contract}</span>`:"--")}
+      </table>`;
+    $$("#archiveBody [data-file]").forEach(el=>el.onclick=()=>toast("劳务教育附件预览："+el.dataset.file));
+    return;
+  }
+  if (archiveTab==="cert"){
+    const rows=a.certs;
+    box.innerHTML=`
+      <div class="hz-sec">人员证书</div>
+      <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>序号</th><th>证书名称</th><th>证书编号</th><th>发证机关</th><th>有效期</th><th>附件</th></tr></thead>
+        <tbody>${rows.map((c,i)=>`<tr><td>${i+1}</td><td>${c.name}</td><td>${c.no}</td><td>${c.org}</td><td>${c.from} ~ ${c.to}</td><td><span class="arch-file" data-file="${c.no}.jpg">查看</span></td></tr>`).join("") || `<tr><td colspan="6" class="muted">暂无证书</td></tr>`}</tbody>
+      </table></div>
+      <div class="pagination"><span>共 ${rows.length} 条</span><span class="page-btn">10 条/页</span><span class="page-btn">‹</span><span class="page-num active">1</span><span class="page-btn">›</span></div>`;
+    $$("#archiveBody [data-file]").forEach(el=>el.onclick=()=>toast("劳务教育证书附件："+el.dataset.file));
+    return;
+  }
+  const rows=a.trains;
+  box.innerHTML=`
+    <div class="hz-sec">培训记录</div>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>序号</th><th>任务主题</th><th>培训类型</th><th>教育类型</th><th>所属项目</th><th>培训时间</th><th>培训学时</th><th>状态</th><th>任务手签</th><th>考试成绩</th><th>考试结果</th><th>考试手签</th></tr></thead>
+      <tbody>${rows.map((r,i)=>`<tr>
+        <td>${i+1}</td><td>${r.theme}</td><td>${r.type}</td><td>${r.edu}</td><td>${r.project}</td>
+        <td>${r.from} ~ ${r.to}</td><td>${r.hours}</td><td>${stHtml(r.status,"ok")}</td>
+        <td>${signMark(p.name)}</td>
+        <td><span class="arch-file" data-score="${r.score}">${r.score}</span></td>
+        <td>${r.result}</td><td>--</td>
+      </tr>`).join("")}</tbody>
+    </table></div>
+    <div class="pagination"><span>共 ${rows.length} 条</span><span class="page-btn">10 条/页</span><span class="page-btn">‹</span><span class="page-num active">1</span><span class="page-btn">›</span></div>`;
+  $$("#archiveBody [data-score]").forEach(el=>el.onclick=()=>{
+    const theme=el.closest("tr").children[1].textContent;
+    showModal("考试成绩", `<p>${p.name}　${theme}</p><p>考试成绩 <b style="font-family:var(--num-font);font-size:28px">${el.dataset.score}</b>　及格线 60 分</p><p class="hint">成绩由劳务教育同步，本页只读。</p>`,`<button class="btn btn-default" id="mCancel">关闭</button>`);
+    $("#mCancel").onclick=closeMask;
+  });
+}
+function renderWorkers(){
+  const rows=workerVisibleRows();
+  $("#workerN").textContent=rows.length;
+  $("#workerTbody").innerHTML = rows.map(p=>{
+    const [st,cls]=pStatus(p);
+    let extra="";
+    if (!p.frozen && can("train")){
+      if (inPersonBL(p)) extra=`<button class="btn-link" data-blview="${p.id}">黑名单详情</button>`;
+      else {
+        if (st==="重点管控") extra=`<button class="btn-link" data-remind="${p.id}">提醒</button>`;
+        else if (st==="停工培训") extra=`<button class="btn-link" data-note-p="${p.id}">下发通知书</button> <button class="btn-link" data-jump-train="${p.id}">去确认加分</button>`;
+        if (personBLHit(p)) extra+=` <button class="btn-danger-text" data-bl="${p.id}">列入黑名单</button>`;
+      }
+    }
+    return `<tr data-id="${p.id}"><td class="chk"><input type="checkbox" class="row-chk" data-id="${p.id}" ${workerSel.has(p.id)?"checked":""} /></td>
+      <td><button class="name-link" data-archive="${p.id}" title="查看教育档案">${p.name}</button><div class="muted">${p.job} · ${p.team||"-"}</div></td><td>${subName(p.sub)}</td>
+      <td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(st,cls)}</td><td>${p.inAt}</td><td>${p.last}</td>
+      <td class="act-cell"><button class="btn-link" data-open="${p.id}">明细</button>${extra?" "+extra:""}</td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="muted">无匹配人员</td></tr>`;
+  $$("#workerTbody td.chk").forEach(td=>td.onclick=e=>e.stopPropagation());
+  $$("#workerTbody .row-chk").forEach(b=>b.onchange=e=>{
+    e.stopPropagation();
+    if (b.checked) workerSel.add(b.dataset.id); else workerSel.delete(b.dataset.id);
+    syncWorkerCheckAll();
+  });
+  $$("#workerTbody [data-open]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openPerson(b.dataset.open); });
+  $$("#workerTbody [data-archive]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openArchive(b.dataset.archive); });
+  $$("#workerTbody [data-remind]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); remindPerson(b.dataset.remind); });
+  $$("#workerTbody [data-note-p]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); noticeFromWorker(b.dataset.noteP); });
+  $$("#workerTbody [data-bl]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); startPersonBL(b.dataset.bl); });
+  $$("#workerTbody [data-blview]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openBLPerson(b.dataset.blview); });
+  $$("#workerTbody [data-jump-train]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); goto("training"); });
+  syncWorkerCheckAll();
+}
+function xmlEsc(v){
+  return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function xlsCell(v, type){
+  const t=type||(typeof v==="number"?"Number":"String");
+  return `<Cell><Data ss:Type="${t}">${xmlEsc(v)}</Data></Cell>`;
+}
+function xlsRow(cells){ return `<Row>${cells.join("")}</Row>`; }
+function xlsSheet(name, head, body){
+  return `<Worksheet ss:Name="${xmlEsc(name)}"><Table>${xlsRow(head.map(h=>xlsCell(h)))}${body.join("")}</Table></Worksheet>`;
+}
+function downloadXls(filename, sheets, msg){
+  const xml=`<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+${sheets.join("\n")}
+</Workbook>`;
+  const blob=new Blob([xml], {type:"application/vnd.ms-excel"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 800);
+  if (msg) toast(msg);
+}
+function logKind(d){
+  const t=d||"";
+  if (/停工培训人工/.test(t) || /加 \d/.test(t) || /确认加分/.test(t)) return "加分";
+  if (/扣/.test(t) && !/关注积分扣分/.test(t) && !/推送/.test(t)) return "扣分";
+  return "其他";
+}
+function selectedWorkers(){
+  return people.filter(p=>workerSel.has(p.id) && inScopePerson(p));
+}
+function exportWorkerLedger(){
+  const rows=selectedWorkers();
+  if (!rows.length){ toast("请先勾选人员，或点击表头全选当前列表"); return; }
+  const listHead=["姓名","工种","班组","分包商","所属项目","当前分","状态","进场日期","最近流水"];
+  const listBody=rows.map(p=>{
+    const st=pStatus(p)[0];
+    return xlsRow([p.name,p.job,p.team||"-",subName(p.sub),p.project||CURRENT_PROJECT,p.score,st,p.inAt||"-",p.last||"-"].map((v,i)=>xlsCell(v, i===5?"Number":"String")));
+  });
+  const detailHead=["姓名","工种","班组","分包商","所属项目","当前分","状态","流水日期","流水类型","积分明细"];
+  const detailBody=[];
+  rows.forEach(p=>{
+    const st=pStatus(p)[0];
+    const logs=(p.logs||[]).slice().sort((a,b)=>(b.t||"").localeCompare(a.t||""));
+    if (!logs.length){
+      detailBody.push(xlsRow([p.name,p.job,p.team||"-",subName(p.sub),p.project||CURRENT_PROJECT,p.score,st,"-","-","暂无积分流水"].map((v,i)=>xlsCell(v, i===5?"Number":"String"))));
+      return;
+    }
+    logs.forEach(l=>{
+      detailBody.push(xlsRow([
+        xlsCell(p.name), xlsCell(p.job), xlsCell(p.team||"-"), xlsCell(subName(p.sub)), xlsCell(p.project||CURRENT_PROJECT),
+        xlsCell(p.score,"Number"), xlsCell(st), xlsCell(l.t||"-"), xlsCell(logKind(l.d)), xlsCell(l.d||"-")
+      ]));
+    });
+  });
+  downloadXls(`人员积分台账-${today().replace(/-/g,"")}.xls`, [
+    xlsSheet("积分列表", listHead, listBody),
+    xlsSheet("积分明细", detailHead, detailBody)
+  ], `已导出 ${rows.length} 人的积分列表与积分明细`);
+}
+function hazardDeductRows(){
+  return hazards.filter(h=>{
+    const m=maps.find(x=>x.id===h.map);
+    const c=m?clauseBy(m.clause):null;
+    if (!c || !c.score) return false;
+    const p=people.find(x=>x.id===h.pid);
+    if (!p || p.frozen) return false;
+    if (!isCompany() && p.project!==CURRENT_PROJECT) return false;
+    return true;
+  }).slice().sort((a,b)=>(b.at||"").localeCompare(a.at||""));
+}
+function renderHazards(){
+  const rows=hazardDeductRows();
+  $("#hzN").textContent=rows.length;
+  $("#hzTbody").innerHTML = rows.map(h=>{
+    const p=people.find(x=>x.id===h.pid);
+    const m=maps.find(x=>x.id===h.map);
+    const c=clauseBy(m.clause);
+    return `<tr><td>${h.src}</td><td>${h.at||"-"}</td>
+      <td>${p.name}</td><td>${p.job} / ${p.team||"-"}</td><td>${subName(p.sub)}</td>
+      <td>${c.name}</td><td style="font-family:var(--num-font);font-weight:700">-${c.score}</td>
+      <td style="font-family:var(--num-font);font-weight:700">${p.score}</td>
+      <td>${stHtml("已入分","ok")}</td>
+      <td class="act-cell"><button class="btn-link" data-hz="${h.id}">查看详情</button></td></tr>`;
+  }).join("") || `<tr><td colspan="10" class="muted">暂无检查扣分记录</td></tr>`;
+  $$("#hzTbody [data-hz]").forEach(b=>b.onclick=()=>openHazardDetail(b.dataset.hz));
+}
+function plusDaysFrom(at, n){
+  const d=new Date((at||today())+"T00:00:00");
+  d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+}
+function hzPhotos(n, label){
+  return `<div class="hz-photos">${Array.from({length:n||2},(_,i)=>`<span class="hz-photo">${label}${i+1}</span>`).join("")}</div>`;
+}
+function descRow(a,b,c,d){
+  return `<tr><td class="k">${a}</td><td class="v">${b||"-"}</td><td class="k">${c}</td><td class="v">${d||"-"}</td></tr>`;
+}
+function descFull(k,v){
+  return `<tr><td class="k">${k}</td><td class="v tall" colspan="3">${v||"-"}</td></tr>`;
+}
+function openHazardDetail(id){
+  const h=hazards.find(x=>x.id===id); if(!h) return;
+  const p=people.find(x=>x.id===h.pid); if(!p) return;
+  const m=maps.find(x=>x.id===h.map);
+  const c=clauseBy(m.clause);
+  const no="JC"+(h.at||"").replace(/-/g,"")+String(h.id.replace(/\D/g,"")).padStart(2,"0");
+  const level=/A类/.test(c.name)?"重大":/B类/.test(c.name)?"较大":/C类/.test(c.name)?"一般":"低";
+  const due=plusDaysFrom(h.at,7);
+  const fixAt=plusDaysFrom(h.at,2)+" 16:00";
+  const checkAt=h.checkAt||(plusDaysFrom(h.at,3)+" 10:00");
+  const site=`${p.project||CURRENT_PROJECT} ${p.team||""}`.trim();
+  showModal("隐患详情", `
+    <div class="hz-sec">基本信息</div>
+    <table class="desc-table">
+      ${descRow("隐患单号", no, "部位", site)}
+      ${descRow("检查来源", h.src, "状态", "复验通过")}
+    </table>
+    <div class="hz-flow">
+      <div class="hz-flow-item">
+        <i class="hz-dot"></i>
+        <div class="hz-sec">检查信息</div>
+        <table class="desc-table">
+          ${descRow("检查时间", (h.at||"-")+" 09:30", "检查人", h.inspector||"项目安全员")}
+          ${descFull("检查单位", "中铁电气化局集团雄忻高铁接触网工程 3 标项目经理部")}
+          ${descRow("检查部位", `${p.job}作业面 / ${p.team||"-"}`, "问题类别", "人员违章")}
+          ${descRow("隐患等级", level, "整改期限", due)}
+          ${descFull("问题描述", `${p.name}（${p.job} / ${p.team||"-"}，${subName(p.sub)}）${h.desc||h.title}`)}
+          ${descFull("扣分分值", `<b style="font-family:var(--num-font)">-${c.score}</b>　${c.name}`)}
+          ${descFull("隐患图片/视频", hzPhotos(3,"现场"))}
+        </table>
+      </div>
+      <div class="hz-flow-item">
+        <i class="hz-dot"></i>
+        <div class="hz-sec">整改信息</div>
+        <table class="desc-table">
+          ${descRow("整改时间", fixAt, "整改人", h.fixer||subName(p.sub)+"现场负责人")}
+          ${descFull("整改单位", subName(p.sub))}
+          ${descFull("整改描述", "已按条款完成整改并组织班前交底，现场复查合格，相关人员已重新接受安全教育。")}
+          ${descFull("整改图片", hzPhotos(2,"整改"))}
+        </table>
+      </div>
+      <div class="hz-flow-item">
+        <i class="hz-dot"></i>
+        <div class="hz-sec">复验闭合</div>
+        <table class="desc-table">
+          ${descRow("复验时间", checkAt, "复验人", "项目安全总监：刘洋")}
+          ${descFull("复验单位", "中铁电气化局集团雄忻高铁接触网工程 3 标项目经理部")}
+          ${descFull("复验结论", "复验通过")}
+        </table>
+      </div>
+    </div>`, "", true);
+}
+function renderTasks(){ renderTrainConfirm(); }
+function examPassLine(){ return 60; }
+function suggestTrainPlus(p, exam){
+  if ((p.trainCount||0)>=2) return 0;
+  if (exam==null || exam<examPassLine()) return 0;
+  return rules.plus;
+}
+function inScopePersonRow(p){
+  if (!p || p.frozen) return false;
+  return isCompany() || p.project===CURRENT_PROJECT;
+}
+function renderTrainConfirm(){
+  const f=($("#trainFilter")&&$("#trainFilter").value)||"all";
+  const company=isCompany();
+  const cols=company?11:10;
+  $("#trainHead").innerHTML=company
+    ? "<tr><th>人员</th><th>所属项目</th><th>工种 / 班组</th><th>所属劳务公司</th><th>当前分</th><th>培训内容</th><th>学时</th><th>考试成绩</th><th>建议加分</th><th>状态</th><th>操作</th></tr>"
+    : "<tr><th>人员</th><th>工种 / 班组</th><th>所属劳务公司</th><th>当前分</th><th>培训内容</th><th>学时</th><th>考试成绩</th><th>建议加分</th><th>状态</th><th>操作</th></tr>";
+  const confRows=trainConfirms.filter(c=>{
+    const p=people.find(x=>x.id===c.pid);
+    if (!inScopePersonRow(p)) return false;
+    if (f==="wait") return c.status==="待确认";
+    if (f==="done") return c.status==="已确认";
+    if (f==="doing") return false;
+    return true;
+  }).map(c=>{
+    const p=people.find(x=>x.id===c.pid);
+    const st=c.status==="已确认"?"ok":"warn";
+    const act=!can("train")
+      ? `<button class="btn-link" data-viewc="${c.id}">查看</button> <button class="btn-link" data-open="${p.id}">扣分明细</button>`
+      : `${c.status==="已确认"
+        ? `<button class="btn-link" data-confirm="${c.id}">调整加分</button>`
+        : `<button class="btn-link" data-confirm="${c.id}">确认加分</button>`} <button class="btn-link" data-open="${p.id}">扣分明细</button>`;
+    const cells=company?`<td>${p.name}</td><td>${p.project||"-"}</td>`:`<td>${p.name}</td>`;
+    return `<tr>${cells}<td>${p.job} / ${p.team||"-"}</td><td>${subName(p.sub)}</td>
+      <td style="font-family:var(--num-font);font-weight:700">${p.score}</td>
+      <td class="cell-reason">${c.course}</td><td>${c.hours}</td>
+      <td style="font-family:var(--num-font);font-weight:700${c.exam>=examPassLine()?"":";color:var(--danger)"}">${c.exam}</td>
+      <td style="font-family:var(--num-font)">${c.status==="已确认"?c.plus:c.suggest}</td>
+      <td>${stHtml(c.status,st)}</td><td class="act-cell">${act}</td></tr>`;
+  });
+  const doing=f==="done"?[]:tasks.filter(t=>{
+    if (t.type!=="train" || t.status==="已完成" || t.status==="超时" || t.status==="待确认加分") return false;
+    if (trainConfirms.some(c=>c.pid===t.pid && c.status!=="已确认")) return false;
+    const p=people.find(x=>x.id===t.pid);
+    return inScopePersonRow(p);
+  }).filter(()=>f==="all"||f==="doing").map(t=>{
+    const p=people.find(x=>x.id===t.pid);
+    const act=can("train")
+      ? `<button class="btn-link" data-note="${t.id}">下发通知书</button> <button class="btn-link" data-open="${p.id}">扣分明细</button>`
+      : `<button class="btn-link" data-open="${p.id}">扣分明细</button>`;
+    const cells=company?`<td>${p.name}</td><td>${p.project||"-"}</td>`:`<td>${p.name}</td>`;
+    return `<tr>${cells}<td>${p.job} / ${p.team||"-"}</td><td>${subName(p.sub)}</td>
+      <td style="font-family:var(--num-font);font-weight:700">${p.score}</td>
+      <td class="muted">劳务教育尚未完成</td><td>-</td><td>-</td><td>-</td>
+      <td>${stHtml(t.status,"warn")}</td><td class="act-cell">${act}</td></tr>`;
+  });
+  $("#taskTbody").innerHTML = [...confRows, ...doing].join("") || `<tr><td colspan="${cols}" class="muted">${f==="wait"?"暂无待确认的劳务教育成绩，可点击同步。":"暂无停工培训记录"}</td></tr>`;
+  const btn=$("#btnSyncTrain"); if(btn) btn.onclick=syncTrainFromEdu;
+  $$("#taskTbody [data-confirm]").forEach(b=>b.onclick=()=>startConfirmPlus(b.dataset.confirm));
+  $$("#taskTbody [data-viewc]").forEach(b=>b.onclick=()=>startConfirmPlus(b.dataset.viewc));
+  $$("#taskTbody [data-open]").forEach(b=>b.onclick=()=>openPersonDeduct(b.dataset.open));
+  $$("#taskTbody [data-note]").forEach(b=>b.onclick=()=>showNotice(b.dataset.note));
+}
+function openPersonDeduct(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  const [st,cls]=pStatus(p);
+  const deduct=(p.logs||[]).filter(l=>/扣/.test(l.d||"") && !/停工培训人工/.test(l.d||""));
+  const plusLogs=(p.logs||[]).filter(l=>/停工培训人工/.test(l.d||""));
+  const confs=trainConfirms.filter(c=>c.pid===p.id);
+  const plusRows=confs.map(c=>{
+    const pass=c.exam>=examPassLine();
+    const act=!can("train")
+      ? `<button class="btn-link" data-pluscid="${c.id}">查看</button>`
+      : (c.status==="已确认"
+        ? `<button class="btn-link" data-pluscid="${c.id}">调整加分</button>`
+        : `<button class="btn-link" data-pluscid="${c.id}">确认加分</button>`);
+    return `<tr>
+      <td>${c.confirmAt||c.doneAt||"-"}</td>
+      <td class="cell-reason">${c.course}<div class="muted">学习内容：${(c.modules||[]).join("、")||"-"}　学时 ${c.hours}</div></td>
+      <td style="font-family:var(--num-font);font-weight:700${pass?"":";color:var(--danger)"}">${c.exam}</td>
+      <td style="font-family:var(--num-font);font-weight:700">${c.status==="已确认"?(c.plus>0?"+"+c.plus:"0"):c.suggest}</td>
+      <td>${stHtml(c.status,c.status==="已确认"?"ok":"warn")}</td>
+      <td class="act-cell">${act}</td></tr>`;
+  }).join("");
+  const plusBlock=confs.length
+    ? `<div class="table-wrap"><table class="data-table">
+        <thead><tr><th>日期</th><th>培训内容</th><th>考试成绩</th><th>加分</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>${plusRows}</tbody></table></div>
+      ${plusLogs.length?`<div class="timeline" style="margin-top:12px">${plusLogs.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join("")}</div>`:""}`
+    : `<p class="muted">尚未从劳务教育同步停工成绩，确认加分后将写入本明细。</p>`;
+  const deductBlock=deduct.length
+    ? `<div class="timeline">${deduct.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join("")}</div>`
+    : `<p class="muted">暂无扣分记录。</p>`;
+  showModal(p.name+" · 积分明细", `<p>项目 ${p.project||CURRENT_PROJECT}　${subName(p.sub)}　${p.job} / ${p.team||"-"}　当前分 <b style="font-family:var(--num-font);font-size:22px">${p.score}</b>　${stHtml(st,cls)}</p>
+    <p class="hint">扣分与培训加分均记入本明细。确认加分后可在此查看记录并再次调整。计分自进场累计至退场。</p>
+    <div class="card-title" style="margin:12px 0 8px">培训加分</div>
+    ${plusBlock}
+    <div class="card-title" style="margin:16px 0 8px">扣分记录</div>
+    ${deductBlock}`,
+    `<button class="btn btn-default" id="mCancel">关闭</button>`, true);
+  $("#mCancel").onclick=closeMask;
+  $$("#modalBody [data-pluscid]").forEach(b=>b.onclick=()=>startConfirmPlus(b.dataset.pluscid));
+}
+function syncTrainFromEdu(){
+  if (!can("train") && !can("account")) { toast("当前角色不能同步劳务教育成绩"); return; }
+  let added=0;
+  eduTrain.forEach(e=>{
+    if (trainConfirms.some(c=>c.pid===e.pid && c.doneAt===e.doneAt)) return;
+    const p=people.find(x=>x.id===e.pid);
+    if (!inScopePersonRow(p)) return;
+    const suggest=suggestTrainPlus(p, e.exam);
+    trainConfirms.unshift({id:"c"+Date.now()+e.pid, pid:e.pid, course:e.course, hours:e.hours, exam:e.exam, doneAt:e.doneAt, modules:e.modules.slice(), suggest, plus:suggest, status:"待确认", trainNo:p.trainCount||1});
+    const t=tasks.find(x=>x.pid===p.id && x.type==="train" && x.status!=="已完成" && x.status!=="超时");
+    if (t) t.status="待确认加分";
+    added++;
+  });
+  toast(added?`已从劳务教育同步 ${added} 条停工教育成绩，请人工确认加分`:"劳务教育停工成绩已全部同步，无新增");
+  render();
+}
+function startConfirmPlus(cid){
+  const c=trainConfirms.find(x=>x.id===cid); if(!c) return;
+  const p=people.find(x=>x.id===c.pid); if(!p) return;
+  const second=(p.trainCount||0)>=2;
+  const pass=c.exam>=examPassLine();
+  const confirmed=c.status==="已确认";
+  const readonly=!can("train");
+  const currentPlus=confirmed?(+c.plus||0):suggestTrainPlus(p, c.exam);
+  const okLabel=confirmed?"保存调整":"确认加分";
+  showModal(p.name+" · "+(confirmed?"调整加分":"人工确认加分"), `<p>项目 ${p.project||CURRENT_PROJECT}　${subName(p.sub)}　${p.job} / ${p.team||"-"}　当前分 <b style="font-family:var(--num-font)">${p.score}</b>　第 ${c.trainNo||p.trainCount||1} 次停工培训</p>
+    <div class="card-title" style="margin:12px 0 8px">劳务教育同步结果</div>
+    <p>课程：${c.course}　完成日期 ${c.doneAt}　学时 ${c.hours}</p>
+    <p>学习内容：${(c.modules||[]).join("、")||"-"}</p>
+    <p>考试成绩 <b style="font-family:var(--num-font);font-size:22px">${c.exam}</b>　合格线 ${examPassLine()}　${pass?stHtml("考试合格","ok"):stHtml("未达合格线","danger")}</p>
+    <div class="form-row"><div class="form-label">确认加分</div><div class="form-control"><input class="input" id="plusVal" type="number" min="0" step="0.5" value="${currentPlus}" ${readonly||second?"disabled":""} style="width:120px" /> <span class="muted">规则建议 ${rules.plus} 分（首次合格），确认后仍可再调</span></div></div>
+    <div class="preview" id="plusPrev"></div>
+    <p class="hint">${second?"第二次停工培训不可复岗加分，应走清退/黑名单。":(pass?"对照学习内容与成绩判断加分，分值可再调整。":"成绩未达标，建议不加分；如现场复核通过，仍可调整分值。")}</p>`,
+    readonly
+      ? `<button class="btn btn-default" id="mCancel">关闭</button>`
+      : `<button class="btn btn-default" id="mCancel">取消</button>${second?`<button class="btn btn-primary" id="plusBl">列入黑名单</button>`:`${confirmed?"":`<button class="btn btn-default" id="plusSkip">不予加分</button>`}<button class="btn btn-primary" id="plusOk">${okLabel}</button>`}`, true);
+  const upd=()=>{
+    const n=Math.max(0, +$("#plusVal").value||0);
+    const prev=confirmed?(+c.plus||0):0;
+    const next=+(p.score+(n-prev)).toFixed(1);
+    $("#plusPrev").textContent=second?"不可加分。":`${confirmed?"调整后":"确认后"}当前分 ${p.score} → ${next}。写入人员积分流水。`;
+  };
+  if ($("#plusVal")) $("#plusVal").oninput=upd; upd();
+  $("#mCancel").onclick=closeMask;
+  const skip=$("#plusSkip"); if(skip) skip.onclick=()=>{ applyTrainPlus(cid, 0); };
+  const ok=$("#plusOk"); if(ok) ok.onclick=()=>{ applyTrainPlus(cid, +$("#plusVal").value||0); };
+  const bl=$("#plusBl"); if(bl) bl.onclick=()=>{ closeMask(); addPersonBL(p.id, "二次停工培训"); };
+}
+function applyTrainPlus(cid, plus){
+  if (!can("train")) { toast("当前角色不能确认加分"); return; }
+  const c=trainConfirms.find(x=>x.id===cid); if(!c) return;
+  const p=people.find(x=>x.id===c.pid); if(!p) return;
+  if ((p.trainCount||0)>=2){ addPersonBL(p.id, "二次停工培训"); closeMask(); return; }
+  const n=Math.max(0, +(+plus||0).toFixed(1));
+  const was=c.status==="已确认";
+  const prev=was?(+c.plus||0):0;
+  const delta=+(n-prev).toFixed(1);
+  if (delta) p.score=+(p.score+delta).toFixed(1);
+  const verb=was?`再次调整加分为 ${n} 分`:(n>0?`确认加分 ${n} 分`:"确认不加分");
+  p.logs.unshift({t:today(), kind:"plus", cid:c.id, d:`停工培训人工${verb}。劳务教育《${c.course}》考试 ${c.exam} 分，学习内容：${(c.modules||[]).join("、")||"-"}。`});
+  p.last=n>0?("培训确认 +"+n):"培训确认不加分";
+  c.status="已确认"; c.plus=n; c.confirmAt=today();
+  const t=tasks.find(x=>x.pid===p.id && x.type==="train" && x.status!=="已完成" && x.status!=="超时");
+  if (t) t.status="已完成";
+  closeMask();
+  toast(was? p.name+" 加分已调整为 "+n+" 分" : (n>0? p.name+" 已确认加 "+n+" 分" : p.name+" 已确认不加分"));
+  render();
+  openPersonDeduct(p.id);
+}
+function visibleSubs(){
+  const q=($("#subQ").value||"").trim();
+  return subs.filter(s=>!q||s.name.includes(q));
+}
+function renderSubs(){
+  $("#subTbody").innerHTML = visibleSubs().map(s=>{
+    const [st,cls]=sStatus(s);
+    return `<tr data-id="${s.id}"><td class="chk"><input type="checkbox" class="row-chk" data-id="${s.id}" ${subSel.has(s.id)?"checked":""} /></td>
+      <td><button class="name-link" data-subinfo="${s.id}" title="查看基本信息">${s.name}</button><div class="muted">负责人 ${s.lead}${s.frozen?" · 已冻结":""}</div></td>
+      <td style="font-family:var(--num-font);font-weight:700">${s.score}</td><td>已扣 ${subLinkTotal(s).toFixed(1)}</td><td>${stHtml(st,cls)}</td>
+      <td class="act-cell"><button class="btn-link" data-open="${s.id}">明细</button></td></tr>`;
+  }).join("");
+  $$("#subTbody [data-subinfo]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openSubInfo(b.dataset.subinfo); });
+  $$("#subTbody [data-open]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openSub(b.dataset.open); });
+  bindRowChecks("#subTbody", subSel, ()=>syncNamedCheckAll("#subTbody .row-chk", "#subCheckAll"));
+}
+function selectedSubs(){
+  return subs.filter(s=>subSel.has(s.id));
+}
+function subLedgerEvents(s){
+  const events=[];
+  (s.logs||[]).forEach(l=>{
+    if (/^人员联动/.test(l.d||"") && (s.links||[]).length) return;
+    events.push({t:l.t||"", kind:logKind(l.d), d:l.d||"-", name:"", score:""});
+  });
+  (s.links||[]).forEach(r=>events.push({t:r.t||"", kind:"人员联动", d:`${r.kind||""} · ${r.reason||""}`.replace(/^ · /,"")||"人员联动", name:r.name||"", score:r.score}));
+  events.sort((a,b)=>(b.t||"").localeCompare(a.t||""));
+  return events;
+}
+function exportSubLedger(){
+  const rows=selectedSubs();
+  if (!rows.length){ toast("请先勾选分包商，或点击表头全选当前列表"); return; }
+  const listHead=["分包商","现场负责人","法人","所属项目","当前分","人员联动已扣","状态","进场日期"];
+  const listBody=rows.map(s=>{
+    const st=sStatus(s)[0];
+    return xlsRow([
+      xlsCell(s.name), xlsCell(s.lead||"-"), xlsCell(s.legal||"-"), xlsCell(subProjText(s)),
+      xlsCell(s.score,"Number"), xlsCell(subLinkTotal(s),"Number"), xlsCell(st), xlsCell(s.inAt||"-")
+    ]);
+  });
+  const detailHead=["分包商","现场负责人","所属项目","当前分","流水日期","流水类型","积分明细","关联人员","联动扣分"];
+  const detailBody=[];
+  rows.forEach(s=>{
+    const events=subLedgerEvents(s);
+    if (!events.length){
+      detailBody.push(xlsRow([s.name,s.lead,subProjText(s),s.score,"-","-","暂无积分流水","-",""].map((v,i)=>xlsCell(v, i===3||i===8?"Number":"String"))));
+      return;
+    }
+    events.forEach(e=>{
+      detailBody.push(xlsRow([
+        xlsCell(s.name), xlsCell(s.lead), xlsCell(subProjText(s)), xlsCell(s.score,"Number"),
+        xlsCell(e.t||"-"), xlsCell(e.kind), xlsCell(e.d), xlsCell(e.name||"-"),
+        e.score===""||e.score==null?xlsCell("-"):xlsCell(e.score,"Number")
+      ]));
+    });
+  });
+  downloadXls(`分包商积分台账-${today().replace(/-/g,"")}.xls`, [
+    xlsSheet("积分列表", listHead, listBody),
+    xlsSheet("积分明细", detailHead, detailBody)
+  ], `已导出 ${rows.length} 家分包商的积分列表与积分明细`);
+}
+function subField(k,v){
+  const empty=v==null||v==="";
+  return `<div class="sub-field"><div class="sub-k">${k}</div><div class="sub-v">${empty?"&nbsp;":v}</div></div>`;
+}
+function subGrid(pairs){
+  return `<div class="sub-info-grid">${pairs.filter(([k])=>k).map(([k,v])=>subField(k,v)).join("")}</div>`;
+}
+function subProfile(s){
+  const bl=inSubBL(s)||s.status==="黑名单";
+  const short=s.name.replace(/有限公司|劳务公司|劳务队|劳务$/g,"").slice(0,8);
+  const area={s1:["河北省保定市","91130606MA00JT01X1","0312","冀"],s2:["河北省石家庄市","91130104MA00XQ02Y2","0311","冀"],s3:["山西省太原市","91140105MA00TJ03Z3","0351","晋"],s4:["河北省邯郸市","91130402MA00HD04W4","0310","冀"]}[s.id]||["河北省保定市","91130000MA00LS00X0","0312","冀"];
+  const phone=area[2]+"-"+String(58000000+seedNum(s.id,3999999)).slice(-8);
+  const legalPhone="13"+String(8000000000+seedNum(s.id+"lp",1999999999)).slice(-9);
+  const leadPhone="13"+String(9000000000+seedNum(s.id+"ld",999999999)).slice(-9);
+  const founded=s.inAt?s.inAt.slice(0,4)+"-"+["03","05","06","08"][seedNum(s.id,4)]+"-15":"2018-06-15";
+  const evalSt=bl?"不合格":s.score>=85?"合格":"待复核";
+  const cap=["300","500","800","1200"][seedNum(s.id,4)]+" 万元";
+  const license=area[3]+"建安许证字〔2024〕第 "+String(1000+seedNum(s.id,8000))+" 号";
+  const addr=area[0]+"建设路 "+(18+seedNum(s.id,60))+" 号";
+  const bankNo="12"+String(1000000000000000+seedNum(s.id+"bk",899999999999999)).slice(-15);
+  return {
+    short, uscc:area[1], code:"", phone, evalSt, scope:"劳务分包、铁路电气化辅助作业",
+    type:"劳务分包", nature:"有限责任公司", founded, addr, identity:"法人单位",
+    gov:"否", grade:bl?"":"三级", email:"", capital:cap, parent:"", cat:"公司",
+    tax:"小规模纳税人", legal:s.legal, legalId:area[1].slice(0,6)+"********"+String(1000+seedNum(s.id,8000)).slice(-4),
+    legalJob:"执行董事", legalTitle:"", legalPhone:legalPhone.slice(0,3)+"****"+legalPhone.slice(-4),
+    contact:s.lead, contactPhone:leadPhone.slice(0,3)+"****"+leadPhone.slice(-4),
+    license, licenseOrg:area[0]+"住房和城乡建设局", licenseTo:"2028-12-31",
+    start:founded, end:"", post:"", remark:"", source:"劳务教育同步",
+    bl:bl?"是":"否", attach:bl?"列入黑名单说明.pdf":"",
+    bankName:s.name, bank:"中国建设银行 "+area[0].slice(2)+"分行", bankNo:bankNo.slice(0,4)+" **** **** "+bankNo.slice(-4),
+    quals:[
+      {name:"建筑业企业资质 · 施工劳务", no:area[3]+"建劳务〔2023〕"+String(200+seedNum(s.id,700)), org:area[0]+"住房和城乡建设局", from:"2023-04-01", to:"2028-04-01"},
+      {name:"安全生产许可证", no:license, org:area[0]+"住房和城乡建设局", from:"2024-03-01", to:"2027-03-01"}
+    ]
+  };
+}
+function openSubInfo(id){
+  subInfoId=id;
+  subInfoTab="base";
+  subInfoMore=true;
+  goto("subInfo");
+}
+function renderSubInfo(){
+  const s=subs.find(x=>x.id===subInfoId);
+  $$("#subInfoTabs .tab-inner").forEach(b=>b.classList.toggle("active", b.dataset.subtab===subInfoTab));
+  $("#subInfoTitle").textContent=s?s.name:"分包商";
+  const box=$("#subInfoBody");
+  if (!s){ box.innerHTML=`<p class="muted">未选择分包商。</p>`; return; }
+  const a=subProfile(s);
+  if (subInfoTab==="base"){
+    box.innerHTML=`
+      <div class="sub-info-block">
+        <div class="sub-info-head">基础信息</div>
+        ${subGrid([
+          ["企业名称", s.name], ["企业简称", a.short], ["是否政府、军队、境外单位", a.gov],
+          ["统一社会信用代码", a.uscc], ["企业类型", a.type], ["资质等级", a.grade],
+          ["企业编码", a.code], ["企业性质", a.nature], ["企业邮箱", a.email],
+          ["电话", a.phone], ["成立日期", a.founded], ["注册资金", a.capital],
+          ["评价状态", a.evalSt], ["地址", a.addr], ["上级单位", a.parent],
+          ["经营范围", a.scope], ["身份类型", a.identity], ["供应商分类", a.cat]
+        ])}
+      </div>
+      <div class="sub-info-block">
+        <div class="sub-info-head">更多 <button class="sub-info-more" id="subInfoMoreBtn">${subInfoMore?"收起 ∧":"展开 ∨"}</button></div>
+        ${subInfoMore?subGrid([
+          ["纳税人类型", a.tax], ["评价等级", blGrade(s)], ["法定代表人联系电话", a.legalPhone],
+          ["法定代表人", a.legal], ["法定代表人职务", a.legalJob], ["法定代表人职称", a.legalTitle],
+          ["法定代表人身份证号", a.legalId], ["注册日期", a.founded], ["联系人", a.contact],
+          ["联系人电话", a.contactPhone], ["邮编", a.post], ["安全生产许可证", a.license],
+          ["许可证有效日期", a.licenseTo], ["许可证颁发机关", a.licenseOrg], ["黑名单", a.bl],
+          ["营业开始日期", a.start], ["营业结束日期", a.end], ["来源", a.source],
+          ["注册地", a.addr], ["备注", a.remark], ["附件", a.attach?`<span class="arch-file" data-file="${a.attach}">${a.attach}</span>`:""],
+          ["详细地址", a.addr]
+        ]):""}
+      </div>`;
+    const more=$("#subInfoMoreBtn");
+    if (more) more.onclick=()=>{ subInfoMore=!subInfoMore; renderSubInfo(); };
+    $$("#subInfoBody [data-file]").forEach(el=>el.onclick=()=>toast("供应商库附件："+el.dataset.file));
+    return;
+  }
+  if (subInfoTab==="bank"){
+    box.innerHTML=`<div class="sub-info-block"><div class="sub-info-head">银行信息</div>${subGrid([["开户名称", a.bankName], ["开户银行", a.bank], ["银行账号", a.bankNo]])}</div>`;
+    return;
+  }
+  if (subInfoTab==="qual"){
+    box.innerHTML=`<div class="sub-info-head">企业资质</div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>序号</th><th>资质名称</th><th>证书编号</th><th>发证机关</th><th>有效期</th></tr></thead>
+      <tbody>${a.quals.map((q,i)=>`<tr><td>${i+1}</td><td>${q.name}</td><td>${q.no}</td><td>${q.org}</td><td>${q.from} ~ ${q.to}</td></tr>`).join("")}</tbody></table></div>`;
+    return;
+  }
+  if (subInfoTab==="people"){
+    const rows=[[a.legal,"法定代表人", a.legalPhone],[s.lead,"现场负责人", a.contactPhone]];
+    box.innerHTML=`<div class="sub-info-head">相关人员</div>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>姓名</th><th>职务</th><th>联系电话</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</tbody></table></div>`;
+    return;
+  }
+  const projs=Object.entries(s.projects||{});
+  box.innerHTML=`<div class="sub-info-head">项目履历</div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>项目</th><th>本项目积分</th><th>进场情况</th></tr></thead>
+    <tbody>${projs.map(([k,v])=>`<tr><td>${k}</td><td style="font-family:var(--num-font);font-weight:700">${v}</td><td>在场</td></tr>`).join("") || `<tr><td colspan="3" class="muted">暂无项目履历</td></tr>`}</tbody></table></div>`;
+}
+function blGrade(s){
+  if (inSubBL(s)||s.status==="黑名单") return "黑名单";
+  if (s.score>=90) return "A";
+  if (s.score>=80) return "B";
+  return "C";
+}
+function statusCls(st){
+  if (st==="黑名单"||st==="清退/黑名单"||st==="停工培训") return "danger";
+  if (st==="重点管控"||st==="已退场冻结") return "warn";
+  return "ok";
+}
+function logsAsOf(entity, at){
+  const logs=[...(entity.logs||[])].filter(l=>(l.t||"")<=at);
+  const inAt=entity.inAt;
+  if (inAt && inAt<=at && !logs.some(l=>(l.t||"")===inAt && /赋分/.test(l.d||""))){
+    logs.push({t:inAt, d:entity.job?"三级教育合格，赋分 100":"领导小组批准进场，赋分 100"});
+  }
+  return logs.sort((a,b)=>(b.t||"").localeCompare(a.t||""));
+}
+function snapPersonJob(p){
+  return ((p.extra||"").split("/")[0]||"").trim();
+}
+function snapSubProjs(s){
+  if (s.projs && s.projs.length) return s.projs;
+  return s.proj ? [s.proj] : [];
+}
+function filteredSnapSubs(snap){
+  const q=snapQ.trim();
+  const company=isCompany();
+  return (snap.subs||[]).filter(s=>{
+    if (q && !(s.n+(s.extra||"")).includes(q)) return false;
+    if (company && snapProj!=="all" && !snapSubProjs(s).includes(snapProj)) return false;
+    return true;
+  });
+}
+function filteredSnapPeople(snap){
+  const q=snapQ.trim();
+  const company=isCompany();
+  return (snap.people||[]).filter(p=>{
+    const job=snapPersonJob(p);
+    const sub=p.sub?subName(p.sub):"";
+    if (q && !(p.n+sub+job+(p.extra||"")).includes(q)) return false;
+    if (snapJob!=="all" && job!==snapJob) return false;
+    if (company && snapProj!=="all" && (p.proj||"")!==snapProj) return false;
+    return true;
+  });
+}
+function renderMonthly(){
+  const months=last6MonthKeys();
+  if (!snapMonth || !months.some(m=>m.key===snapMonth)){
+    const due=[...months].reverse().find(m=>monthDue(m.key)||histSnaps[m.key]);
+    snapMonth=due?due.key:months[months.length-1].key;
+  }
+  const sel=$("#snapMonthSel");
+  sel.innerHTML=months.map(m=>`<option value="${m.key}">${monthLabel(m.key)}</option>`).join("");
+  sel.value=snapMonth;
+  sel.onchange=()=>{ snapMonth=sel.value; renderMonthly(); };
+  $("#snapTitle").textContent=`${monthLabel(snapMonth)}考核快照`;
+  $("#snapHint").textContent=`系统按规则配置每月 ${rules.snapDay} 日自动锁定当时累计分与状态，不重置账户。到达节点后生成当月快照，可切换历史月份查看。点击行可查看截至快照日的扣分流水。审核后通报月度安全例会并上报工程公司。`;
+  const snap=getSnap(snapMonth);
+  const due=monthDue(snapMonth);
+  $$("#snapTabs .tab-inner").forEach(b=>b.classList.toggle("active", b.dataset.snap===snapTab));
+  const filterBar=$("#snapFilterBar");
+  if (!snap){
+    $("#snapTabs").classList.add("is-hide");
+    filterBar.classList.add("is-hide");
+    $("#snapMeta").textContent=`考核节点 每月 ${rules.snapDay} 日`;
+    $("#snapBox").className="hint";
+    $("#snapBox").style.padding="24px 0";
+    $("#snapBox").style.textAlign="center";
+    $("#snapBox").innerHTML=`尚未到达考核节点。本月节点为 ${snapAt(snapMonth)}，系统将在到达后自动生成快照。可切换历史月份查看已锁定数据。`;
+    return;
+  }
+  $("#snapTabs").classList.remove("is-hide");
+  filterBar.classList.remove("is-hide");
+  $$("#snapTabs .tab-inner").forEach(b=>{
+    b.textContent=b.dataset.snap==="s"?`分包商（${snap.subs.length}）`:`人员（${snap.people.length}）`;
+  });
+  $("#snapQ").placeholder=snapTab==="s"?"搜索分包商":"搜索姓名 / 分包商";
+  const jobs=[...new Set((snap.people||[]).map(snapPersonJob).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"zh"));
+  snapJob=fillNamedSelect($("#snapJob"), snapJob, "全部工种", jobs);
+  $("#snapJob").classList.toggle("is-hide", snapTab!=="p");
+  $("#snapProj").classList.toggle("is-hide", !isCompany());
+  if (isCompany()){
+    fillProjectSelect($("#snapProj"), snapProj, true);
+    snapProj=$("#snapProj").value||"all";
+  }
+  $("#snapBox").className="";
+  $("#snapBox").style.padding="";
+  $("#snapBox").style.textAlign="";
+  $("#snapMeta").textContent=snap.auto?`已于 ${snap.at} 自动锁定`:`锁定于 ${snap.at}`;
+  const showProj=isCompany();
+  const approve=can("eval") && snapMonth===currentMonthKey() && due
+    ? `<div style="margin-top:12px;text-align:right"><button class="btn btn-primary" id="btnApprove">领导小组审核通过并通报</button></div>` : "";
+  const note=`<p class="muted" style="margin-bottom:12px">${snap.auto?"当前月已按考核节点自动生成，分数为锁定当时的累计分。":"历史月份快照，仅供查阅，不回写账户。"}点击行查看截至 ${snap.at} 的扣分流水明细。</p>`;
+  if (snapTab==="s"){
+    const list=filteredSnapSubs(snap);
+    const head=showProj
+      ? "<tr><th>分包商</th><th>所属项目</th><th>现场负责人</th><th>快照分</th><th>状态</th><th>操作</th></tr>"
+      : "<tr><th>分包商</th><th>现场负责人</th><th>快照分</th><th>状态</th><th>操作</th></tr>";
+    const empty=list.length?"":`<tr><td colspan="${showProj?6:5}" class="muted">${snap.subs.length?"无匹配分包商":"该月无分包商快照"}</td></tr>`;
+    const rows=list.map(s=>{
+      const projText=(s.projs&&s.projs.length?s.projs.join("、"):s.proj)||"-";
+      return showProj
+        ? `<tr class="clickable" data-kind="s" data-id="${s.id||""}" data-name="${s.n}"><td>${s.n}</td><td>${projText}</td><td>${s.extra||"-"}</td><td style="font-family:var(--num-font);font-weight:700">${s.s}</td><td>${stHtml(s.st,statusCls(s.st))}</td><td><button class="btn-link">扣分流水</button></td></tr>`
+        : `<tr class="clickable" data-kind="s" data-id="${s.id||""}" data-name="${s.n}"><td>${s.n}</td><td>${s.extra||"-"}</td><td style="font-family:var(--num-font);font-weight:700">${s.s}</td><td>${stHtml(s.st,statusCls(s.st))}</td><td><button class="btn-link">扣分流水</button></td></tr>`;
+    }).join("") || empty;
+    $("#snapBox").innerHTML=`${note}<div class="table-wrap"><table class="data-table"><thead>${head}</thead><tbody>${rows}</tbody></table></div>${approve}`;
+  } else {
+    const list=filteredSnapPeople(snap);
+    const head=showProj
+      ? "<tr><th>姓名</th><th>所属项目</th><th>工种 / 班组</th><th>所属劳务公司</th><th>快照分</th><th>状态</th><th>操作</th></tr>"
+      : "<tr><th>姓名</th><th>工种 / 班组</th><th>所属劳务公司</th><th>快照分</th><th>状态</th><th>操作</th></tr>";
+    const empty=list.length?"":`<tr><td colspan="${showProj?7:6}" class="muted">${snap.people.length?"无匹配人员":"该月无人员快照"}</td></tr>`;
+    const rows=list.map(p=>{
+      const company=p.sub?subName(p.sub):subName((people.find(x=>x.id===p.id||x.name===p.n)||{}).sub);
+      return showProj
+        ? `<tr class="clickable" data-kind="p" data-id="${p.id||""}" data-name="${p.n}" data-proj="${p.proj||""}"><td>${p.n}</td><td>${p.proj||"-"}</td><td>${p.extra||"-"}</td><td>${company}</td><td style="font-family:var(--num-font);font-weight:700">${p.s}</td><td>${stHtml(p.st,statusCls(p.st))}</td><td><button class="btn-link">扣分流水</button></td></tr>`
+        : `<tr class="clickable" data-kind="p" data-id="${p.id||""}" data-name="${p.n}"><td>${p.n}</td><td>${p.extra||"-"}</td><td>${company}</td><td style="font-family:var(--num-font);font-weight:700">${p.s}</td><td>${stHtml(p.st,statusCls(p.st))}</td><td><button class="btn-link">扣分流水</button></td></tr>`;
+    }).join("") || empty;
+    $("#snapBox").innerHTML=`${note}<div class="table-wrap"><table class="data-table"><thead>${head}</thead><tbody>${rows}</tbody></table></div>${approve}`;
+  }
+  const btn=$("#btnApprove"); if(btn) btn.onclick=()=>toast("已通报月度安全例会并上报工程公司");
+  $$("#snapBox tr.clickable").forEach(tr=>tr.onclick=()=>openSnapFlow(tr.dataset.kind, tr.dataset.id, tr.dataset.name, tr.dataset.proj, snap));
+}
+function openSnapFlow(kind, id, name, proj, snap){
+  const at=snap.at;
+  if (kind==="s"){
+    const s=subs.find(x=>x.id===id) || subs.find(x=>x.name===name);
+    if (!s){ toast("未找到该分包商账户"); return; }
+    const row=(snap.subs||[]).find(x=>x.n===s.name)||{};
+    const all=logsAsOf(s, at).filter(l=>!/^人员联动/.test(l.d||""));
+    const deduct=all.filter(l=>/扣/.test(l.d||""));
+    const tl=all.length?all.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join(""):`<p class="muted">截至 ${at} 尚无其他流水。</p>`;
+    showModal(s.name+" · 快照扣分流水", `<p>锁定日 ${at}　快照分 <b style="font-family:var(--num-font);font-size:22px">${row.s!=null?row.s:s.score}</b>　${stHtml(row.st||sStatus(s)[0],statusCls(row.st||sStatus(s)[0]))}</p>
+      <p class="hint">仅展示不晚于快照日的记录，快照日之后的扣分不计入。${deduct.length?`截至该日其他扣分 ${deduct.length} 笔。`:""}</p>
+      ${linkTableHtml(s, at)}
+      <div class="card-title" style="margin:16px 0 8px">账户流水</div>
+      <div class="timeline">${tl}</div>`,
+      `<button class="btn btn-default" id="mCancel">关闭</button>`, true);
+  } else {
+    const p=people.find(x=>x.id===id) || people.find(x=>x.name===name && (!proj || x.project===proj));
+    if (!p){ toast("未找到该人员账户"); return; }
+    const row=(snap.people||[]).find(x=>x.n===p.name && (!proj || x.proj===p.project))||{};
+    const all=logsAsOf(p, at);
+    const deduct=all.filter(l=>/扣/.test(l.d||""));
+    const tl=all.length?all.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join(""):`<p class="muted">截至 ${at} 尚无流水。</p>`;
+    showModal(p.name+" · 快照扣分流水", `<p>项目：${p.project||CURRENT_PROJECT}　${subName(p.sub)}　${p.job} / ${p.team||"-"}</p>
+      <p>锁定日 ${at}　快照分 <b style="font-family:var(--num-font);font-size:22px">${row.s!=null?row.s:p.score}</b>　${stHtml(row.st||"正常",statusCls(row.st||"正常"))}</p>
+      <p class="hint">仅展示不晚于快照日的计分流水，快照日之后的扣分不计入。截至该日扣分 ${deduct.length} 笔。</p>
+      <div class="timeline">${tl}</div>`,
+      `<button class="btn btn-default" id="mCancel">关闭</button>`);
+  }
+  $("#mCancel").onclick=closeMask;
+}
+function renderMaster(){
+  const part=frozen=>frozen?stHtml("不参与考核","warn"):stHtml("参与考核","ok");
+  const acts=(frozen,id,kind)=>`<span class="act-cell"><button class="btn-danger-text" data-kind="${kind}" data-out="${id}" ${frozen?"disabled":""}>退场冻结</button> <button class="btn-link" data-kind="${kind}" data-in="${id}" ${frozen?"":"disabled"}>重新进场</button></span>`;
+  const subRows=isCompany()?subs:subs.filter(s=>!s.projects||s.projects[CURRENT_PROJECT]!=null);
+  $("#acctSubTbody").innerHTML=subRows.map(s=>{
+    const [st,cls]=sStatus(s);
+    return `<tr><td>${s.name}</td><td>${s.lead}</td><td style="font-family:var(--num-font);font-weight:700">${s.score}</td><td>${stHtml(st,cls)}</td><td>${s.inAt}</td><td>${part(s.frozen)}</td><td>${acts(s.frozen,s.id,"s")}</td></tr>`;
+  }).join("") || `<tr><td colspan="7" class="muted">暂无分包商账户</td></tr>`;
+  const personRows=people.filter(p=>isCompany()||p.project===CURRENT_PROJECT);
+  $("#acctPersonTbody").innerHTML=personRows.map(p=>{
+    const [st,cls]=pStatus(p);
+    return `<tr><td>${p.name}</td><td>${p.job} / ${p.team||"-"}</td><td>${subName(p.sub)}</td><td style="font-family:var(--num-font);font-weight:700">${p.score}</td><td>${stHtml(st,cls)}</td><td>${p.inAt}</td><td>${part(p.frozen)}</td><td>${acts(p.frozen,p.id,"p")}</td></tr>`;
+  }).join("") || `<tr><td colspan="8" class="muted">暂无人员账户</td></tr>`;
+  $$("#view-master [data-out]").forEach(b=>b.onclick=()=>freezeAccount(b.dataset.kind, b.dataset.out));
+  $$("#view-master [data-in]").forEach(b=>b.onclick=()=>unfreezeAccount(b.dataset.kind, b.dataset.in));
+}
+function freezeAccount(kind, id){
+  if (!can("account")) { toast("当前角色不能办理退场冻结"); return; }
+  if (kind==="s"){
+    const s=subs.find(x=>x.id===id); if(!s||s.frozen) return;
+    s.frozen=true;
+    s.logs.unshift({t:today(), d:"退场冻结账户，保留历史流水，不再参与积分考核"});
+    toast(s.name+" 已退场冻结，不再参与积分考核");
+  } else {
+    const p=people.find(x=>x.id===id); if(!p||p.frozen) return;
+    p.frozen=true;
+    p.logs.unshift({t:today(), d:"退场冻结账户，保留历史流水，不再参与积分考核"});
+    toast(p.name+" 已退场冻结，不再参与积分考核");
+  }
+  render();
+}
+function unfreezeAccount(kind, id){
+  if (!can("account")) { toast("当前角色不能办理重新进场"); return; }
+  if (kind==="s"){
+    const s=subs.find(x=>x.id===id); if(!s||!s.frozen) return;
+    s.frozen=false;
+    s.logs.unshift({t:today(), d:"重新进场，恢复参与积分考核，沿用原累计分"});
+    toast(s.name+" 已重新进场，恢复参与积分考核");
+  } else {
+    const p=people.find(x=>x.id===id); if(!p||!p.frozen) return;
+    p.frozen=false;
+    p.logs.unshift({t:today(), d:"重新进场，恢复参与积分考核，沿用原累计分"});
+    toast(p.name+" 已重新进场，恢复参与积分考核");
+  }
+  render();
+}
+function syncSubsFromEdu(){
+  if (!can("account")) { toast("当前角色不能同步劳务教育数据"); return; }
+  let added=0;
+  eduSubs.forEach(e=>{
+    if (subs.some(s=>s.id===e.id||s.name===e.name)) return;
+    if (!isCompany() && e.projects && e.projects[CURRENT_PROJECT]==null) return;
+    subs.push({id:e.id, name:e.name, lead:e.lead, legal:e.legal||"待补充", score:100, link:0, links:[], status:"正常", inAt:e.inAt||today(), frozen:false, projects:e.projects||{[CURRENT_PROJECT]:100}, logs:[{t:today(), d:"从劳务教育同步，三级教育/进场信息已核验，赋分 100"}]});
+    added++;
+  });
+  toast(added?`已从劳务教育同步 ${added} 家分包商，已建立积分账户`:"劳务教育分包商已全部同步，无新增");
+  render();
+}
+function syncPeopleFromEdu(){
+  if (!can("account")) { toast("当前角色不能同步劳务教育数据"); return; }
+  let added=0;
+  eduPeople.forEach(e=>{
+    if (!isCompany() && e.project!==CURRENT_PROJECT) return;
+    if (people.some(p=>p.id===e.id||(p.name===e.name && p.project===e.project))) return;
+    if (!subs.some(s=>s.id===e.sub)) return;
+    people.push({id:e.id, name:e.name, sub:e.sub, job:e.job, team:e.team||"待分班", project:e.project||CURRENT_PROJECT, score:100, last:"赋分 100", trainCount:0, inAt:e.inAt||today(), frozen:false, logs:[{t:today(), d:"从劳务教育同步，三级教育合格，赋分 100"}]});
+    added++;
+  });
+  toast(added?`已从劳务教育同步 ${added} 名人员，已建立积分账户`:"劳务教育人员已全部同步，无新增");
+  render();
+}
+function renderRules(){
+  $$("#ruleTabs .tab-inner").forEach(b=>b.classList.toggle("active", b.dataset.tab===ruleTab));
+  if (ruleTab==="grade"){
+    $("#ruleBody").innerHTML = `<div class="cfg-card"><h3>人员预警分级 <span>低于该分数触发，不含本数</span></h3>
+      <p class="hint-pill" style="margin-bottom:12px">用于作业人员当前累计分的分级处置。90 预警与 85 自学可同时存在；停工培训、清退覆盖前序状态。</p>
+      <div class="form-row"><div class="form-label">重点管控线</div><div class="form-control"><input class="input" id="r90" type="number" value="${rules.warn}" style="width:120px" /> <span class="muted">分以下预警并重点管控，默认 90</span></div></div>
+      <div class="form-row"><div class="form-label">自主学习区间</div><div class="form-control"><input class="input" id="r85" type="number" value="${rules.learn}" style="width:120px" /> <span class="muted">分至管控线之间发自学任务，默认 85</span></div></div>
+      <div class="form-row"><div class="form-label">停工培训线</div><div class="form-control"><input class="input" id="r80" type="number" value="${rules.train}" style="width:120px" /> <span class="muted">分以下停工培训，默认 80</span></div></div>
+      <div class="form-row"><div class="form-label">清退线</div><div class="form-control"><input class="input" id="r70" type="number" value="${rules.out}" style="width:120px" /> <span class="muted">分以下清退并进黑名单，默认 70</span></div></div>
+      <div class="form-row"><div class="form-label">培训超时天数</div><div class="form-control"><input class="input" id="rDays" type="number" value="${rules.days}" style="width:120px" /> <span class="muted">天未完成则自动进入人员黑名单，默认 7</span></div></div>
+      <button class="btn btn-primary" id="btnSaveGrade">保存分级</button></div>`;
+    $("#btnSaveGrade").onclick=()=>{
+      rules.warn=+$("#r90").value; rules.learn=+$("#r85").value; rules.train=+$("#r80").value; rules.out=+$("#r70").value; rules.days=+$("#rDays").value;
+      toast("人员预警分级已保存，后续记分按新分级计算"); render();
+    };
+  } else if (ruleTab==="plus"){
+    $("#ruleBody").innerHTML = `<div class="cfg-card"><h3>加分规则 <span>仅停工培训确认后写入人员账户</span></h3>
+      <p class="hint-pill" style="margin-bottom:12px">自学不再加分。停工培训须劳务教育成绩同步后，由项目人工确认；建议分值确认时及确认后均可再调。第二次停工培训不开放复岗加分。</p>
+      <div class="form-row"><div class="form-label">停工培训建议加分</div><div class="form-control"><input class="input" id="rPlus" type="number" value="${rules.plus}" style="width:120px" /> <span class="muted">分 / 次，确认时可改，仅首次且考试合格，默认 10</span></div></div>
+      <button class="btn btn-primary" id="btnSavePlus">保存加分规则</button></div>`;
+    $("#btnSavePlus").onclick=()=>{
+      rules.plus=+$("#rPlus").value;
+      toast("加分规则已保存"); render();
+    };
+  } else if (ruleTab==="snap"){
+    $("#ruleBody").innerHTML = `<div class="cfg-card"><h3>月度考核节点 <span>到达该日后系统自动生成当月快照</span></h3>
+      <p class="hint-pill" style="margin-bottom:12px">无需手工点击生成。选定每月考核日后，系统在到达该日时锁定当时累计分与状态，不重置账户。历史月份快照可在「月度考核」中切换查看。</p>
+      <div class="form-row"><div class="form-label">每月考核日</div><div class="form-control"><input class="input" id="rSnapDay" type="number" min="1" max="28" value="${rules.snapDay}" style="width:120px" /> <span class="muted">日，可选 1–28，默认 25 日</span></div></div>
+      <div class="preview" id="snapPrev"></div>
+      <button class="btn btn-primary" id="btnSaveSnap" style="margin-top:12px">保存考核节点</button></div>`;
+    const updSnap=()=>{
+      const d=Math.min(28, Math.max(1, +$("#rSnapDay").value||25));
+      const cur=currentMonthKey();
+      const at=(()=>{ const [y,m]=cur.split("-").map(Number); const last=new Date(y,m,0).getDate(); return `${cur}-${String(Math.min(d,last)).padStart(2,"0")}`; })();
+      $("#snapPrev").textContent=today()>=at?`当前月 ${monthLabel(cur)} 已到达节点 ${at}，进入月度考核即可查看自动快照。`:`当前月 ${monthLabel(cur)} 节点为 ${at}，尚未到达，系统将在该日自动生成；此前可查看历史月份。`;
+    };
+    $("#rSnapDay").oninput=updSnap; updSnap();
+    $("#btnSaveSnap").onclick=()=>{
+      rules.snapDay=Math.min(28, Math.max(1, +$("#rSnapDay").value||25));
+      $("#rSnapDay").value=rules.snapDay;
+      toast("考核节点已保存：每月 "+rules.snapDay+" 日自动生成当月快照");
+      render();
+    };
+  } else if (ruleTab==="link"){
+    $("#ruleBody").innerHTML = `<div class="cfg-card"><h3>分包商人员联动扣分 <span>按发生人次累计</span></h3>
+      <p class="hint-pill" style="margin-bottom:12px">所属作业人员出现下列情形时，系统自动从分包商账户扣分，并写入联动流水。</p>
+      <div class="form-row"><div class="form-label">进入黑名单</div><div class="form-control"><input class="input" id="rLinkBl" type="number" value="${rules.linkBl}" step="0.1" style="width:120px" /> <span class="muted">分 / 人，默认 1</span></div></div>
+      <div class="form-row"><div class="form-label">产生停工培训单</div><div class="form-control"><input class="input" id="rLinkTrain" type="number" value="${rules.linkTrain}" step="0.1" style="width:120px" /> <span class="muted">分 / 人，默认 0.5</span></div></div>
+      <div class="form-row"><div class="form-label">发生违规记分</div><div class="form-control"><input class="input" id="rLinkVio" type="number" value="${rules.linkVio}" step="0.1" style="width:120px" /> <span class="muted">分 / 人（A–D 类），默认 0.1</span></div></div>
+      <div class="preview" id="linkPrev"></div>
+      <button class="btn btn-primary" id="btnSaveLink" style="margin-top:12px">保存联动标准</button></div>`;
+    const updLink=()=>{
+      const a=+$("#rLinkBl").value, b=+$("#rLinkTrain").value, c=+$("#rLinkVio").value;
+      $("#linkPrev").textContent=`人员联动按人次累计（黑名单 ${a}/人，培训单 ${b}/人，违规 ${c}/人）。`;
+    };
+    $("#rLinkBl").oninput=$("#rLinkTrain").oninput=$("#rLinkVio").oninput=updLink; updLink();
+    $("#btnSaveLink").onclick=()=>{
+      rules.linkBl=+$("#rLinkBl").value; rules.linkTrain=+$("#rLinkTrain").value; rules.linkVio=+$("#rLinkVio").value;
+      toast("人员联动扣分标准已保存，后续联动按新标准计算"); render();
+    };
+  } else if (ruleTab==="pstd"||ruleTab==="sstd"||ruleTab==="card"){
+    const list=clauses.filter(c=>ruleTab==="pstd"?c.obj==="p":ruleTab==="sstd"?(c.obj==="s"||c.obj==="s14"):c.obj==="card");
+    const hint={pstd:"A 类 10 / B 类 8 / C 类 5 / D 类 2 / E 类 0（仅警告）。记分时必选一条启用标准，可新增本项目条款。",sstd:"第十四条直接列入分包商黑名单，不走普通扣分、无审批。第十五条每次 10 分，第十六条每次 5 分。可按现场情况增补条款。",card:"仅作人工评价参照，与第十五、十六条并行扣分，系统不去重。可新增灰 / 黄 / 红牌参照条款。"}[ruleTab];
+    const addName={pstd:"新增违章条款",sstd:"新增分包商条款",card:"新增牌参照条款"}[ruleTab];
+    $("#ruleBody").innerHTML = `<div class="toolbar"><button class="btn btn-primary" id="btnAddClause">${addName}</button></div>
+      <p class="hint-pill" style="margin-bottom:12px">${hint}</p>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>条款</th><th>处理</th><th>启用</th><th>操作</th></tr></thead><tbody>
+      ${list.map(c=>`<tr><td>${c.name}${c.custom?' <span class="muted">自定义</span>':""}</td><td>${c.obj==="s14"?"直接列入黑名单":(c.score?("扣 "+c.score+" 分"):"警告不扣分")}</td>
+        <td><button class="btn-link" data-on="${c.id}">${c.on?"启用":"停用"}</button></td>
+        <td>${c.custom?`<button class="btn-danger-text" data-del="${c.id}">删除</button>`:"-"}</td></tr>`).join("")}
+      </tbody></table></div>`;
+    $("#btnAddClause").onclick=()=>startAddClause(ruleTab);
+    $$("#ruleBody [data-del]").forEach(b=>b.onclick=()=>{
+      const i=clauses.findIndex(c=>c.id===b.dataset.del);
+      if (i>=0){ clauses.splice(i,1); toast("已删除自定义条款"); renderRules(); }
+    });
+  } else {
+    $("#ruleBody").innerHTML = `<p class="hint-pill" style="margin-bottom:12px">将检查项/隐患类型对应到人员违章条款。检查源头按映射直接扣分；未映射与 E 类警告不同步到检查扣分明细。</p>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>隐患/检查项</th><th>映射条款</th></tr></thead><tbody>
+      ${maps.map(m=>`<tr><td>${m.hz}</td><td>${clauseBy(m.clause).name}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+  $$("#ruleBody [data-on]").forEach(b=>b.onclick=()=>{ const c=clauseBy(b.dataset.on); c.on=!c.on; renderRules(); toast(c.name+(c.on?" 已启用":" 已停用")); });
+}
+function nextClauseId(prefix){
+  let i=1; while(clauses.some(c=>c.id===prefix+i)) i++; return prefix+i;
+}
+function startAddClause(tab){
+  const titles={pstd:"新增人员违章条款",sstd:"新增分包商标准条款",card:"新增灰黄红牌参照"}[tab];
+  const kindRow = tab==="pstd"
+    ? `<div class="form-row"><div class="form-label">违章类别</div><div class="form-control"><select class="select-box" id="cKind" style="width:100%">
+        <option value="A">A 类（默认扣 10 分）</option>
+        <option value="B">B 类（默认扣 8 分）</option>
+        <option value="C">C 类（默认扣 5 分）</option>
+        <option value="D">D 类（默认扣 2 分）</option>
+        <option value="E">E 类（警告，默认不扣分）</option>
+      </select></div></div>`
+    : tab==="sstd"
+    ? `<div class="form-row"><div class="form-label">标准类型</div><div class="form-control"><select class="select-box" id="cKind" style="width:100%">
+        <option value="15">第十五条（每次扣 10 分）</option>
+        <option value="16">第十六条（每次扣 5 分）</option>
+        <option value="14">第十四条（直接列入黑名单，不走普通扣分）</option>
+      </select></div></div>`
+    : `<div class="form-row"><div class="form-label">牌别</div><div class="form-control"><select class="select-box" id="cKind" style="width:100%">
+        <option value="灰">灰牌参照</option>
+        <option value="黄">黄牌参照</option>
+        <option value="红">红牌参照</option>
+      </select></div></div>`;
+  showModal(titles, `${kindRow}
+    <div class="form-row"><div class="form-label">条款名称</div><div class="form-control"><input class="input" id="cName" placeholder="填写现场可识别的条款名称" /></div></div>
+    <div class="form-row"><div class="form-label">扣分值</div><div class="form-control"><input class="input" id="cScore" type="number" step="0.1" min="0" style="width:120px" /> <span class="muted" id="cScoreHint"></span></div></div>
+    <div class="preview" id="cPrev"></div>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="cOk">保存并启用</button>`);
+  const scoreOf=()=>{
+    const k=$("#cKind").value;
+    if (tab==="pstd") return {A:10,B:8,C:5,D:2,E:0}[k];
+    if (tab==="sstd") return {14:0,15:10,16:5}[k];
+    return {灰:1,黄:5,红:10}[k];
+  };
+  const upd=()=>{
+    const k=$("#cKind").value;
+    const lock=tab==="sstd" && k==="14";
+    $("#cScore").disabled=lock;
+    if (lock) $("#cScore").value=0;
+    $("#cScoreHint").textContent=lock?"第十四条不记普通分，直接列入黑名单":"可按项目实际调整，保存后立即用于记分/评价";
+    const name=($("#cName").value||"").trim()||"（未填写名称）";
+    const sc=+$("#cScore").value||0;
+    if (tab==="pstd") $("#cPrev").textContent=`将作为 ${k} 类条款启用。${sc?("记分扣 "+sc+" 分。"):"仅警告责令整改，分数不变。"}`;
+    else if (tab==="sstd") $("#cPrev").textContent=k==="14"?`将进入第十四条库，确认后直接列入分包商黑名单，不从账户扣分。条款：${name}`:`将进入第${k==="15"?"十五":"十六"}条库，评价时扣 ${sc} 分。条款：${name}`;
+    else $("#cPrev").textContent=`将作为${k}牌参照启用，与第十五、十六条并行扣 ${sc} 分，系统不去重。`;
+  };
+  $("#cScore").value=scoreOf();
+  $("#cKind").onchange=()=>{ $("#cScore").value=scoreOf(); upd(); };
+  $("#cName").oninput=$("#cScore").oninput=upd; upd();
+  $("#mCancel").onclick=closeMask;
+  $("#cOk").onclick=()=>{
+    const name=($("#cName").value||"").trim();
+    if (!name){ toast("请填写条款名称"); return; }
+    const k=$("#cKind").value;
+    const sc=Math.max(0, +$("#cScore").value||0);
+    let item;
+    if (tab==="pstd"){
+      item={id:nextClauseId(k), obj:"p", name:`${k}类 · ${name}`, score:sc, on:true, custom:true};
+    } else if (tab==="sstd"){
+      if (k==="14") item={id:nextClauseId("S14-"), obj:"s14", name:`第十四条 · ${name}`, score:0, on:true, custom:true};
+      else item={id:nextClauseId(k==="15"?"S15-":"S16-"), obj:"s", name:`第${k==="15"?"十五":"十六"}条 · ${name}`, score:sc, on:true, custom:true};
+    } else {
+      const prefix={灰:"GRAY-",黄:"YEL-",红:"RED-"}[k];
+      item={id:nextClauseId(prefix), obj:"card", name:`${k}牌参照 · ${name}`, score:sc, on:true, custom:true};
+    }
+    clauses.push(item);
+    closeMask();
+    toast(item.name+" 已加入规则库，可用于记分或评价");
+    renderRules();
+  };
+}
+function renderCompany(){
+  $("#companyBody").innerHTML = subs.map(s=>{
+    const vals=Object.values(s.projects); const avg=+(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
+    const bl=inSubBL(s);
+    const st=bl?"黑名单":"正常";
+    const cls=bl?"danger":"ok";
+    const rows=Object.entries(s.projects).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+    return `<details><summary><b>${s.name}</b>　公司平均分 ${avg}　${stHtml(st,cls)}</summary>
+      <div class="table-wrap" style="margin-top:8px"><table class="data-table"><thead><tr><th>项目</th><th>项目分</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
+  }).join("");
+}
+function fillNamedSelect(sel, value, allLabel, items){
+  if (!sel) return "all";
+  const opts=[["all", allLabel]].concat(items.map(v=>[v,v]));
+  sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");
+  const ok=opts.some(o=>o[0]===value);
+  sel.value=ok?value:"all";
+  return sel.value;
+}
+function blPersonJobOf(x){
+  const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+  return x.job||(p&&p.job)||"";
+}
+function blPersonSubOf(x){
+  const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+  return subName(x.sub||(p&&p.sub));
+}
+function blPersonProjOf(x){
+  const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+  return x.project||(p&&p.project)||"";
+}
+function filteredPersonBL(){
+  const q=blpQ.trim();
+  const company=isCompany();
+  return activePersonBL().filter(x=>{
+    const job=blPersonJobOf(x);
+    if (q && !(x.name+blPersonSubOf(x)+job).includes(q)) return false;
+    if (blpJob!=="all" && job!==blpJob) return false;
+    if (company && blpProj!=="all" && blPersonProjOf(x)!==blpProj) return false;
+    return true;
+  });
+}
+function filteredSubBL(){
+  const q=blsQ.trim();
+  const company=isCompany();
+  return activeSubBL().filter(x=>{
+    const s=subs.find(ss=>ss.id===x.sid);
+    if (!s) return false;
+    if (q && !(s.name+(s.lead||"")).includes(q)) return false;
+    if (blsRule!=="all" && (x.rule||"")!==blsRule) return false;
+    if (company && blsProj!=="all" && !(s.projects && s.projects[blsProj]!=null)) return false;
+    return true;
+  });
+}
+function activePersonBL(){
+  return personBL.filter(x=>{
+    if (x.removed) return false;
+    if (isCompany()) return true;
+    return x.project===CURRENT_PROJECT;
+  });
+}
+function activeSubBL(){
+  return subBL.filter(x=>{
+    if (x.removed) return false;
+    const s=subs.find(ss=>ss.id===x.sid);
+    if (!s) return false;
+    if (isCompany()) return true;
+    return !s.projects || s.projects[CURRENT_PROJECT]!=null;
+  });
+}
+function subProjText(s){
+  return Object.keys(s.projects||{}).join("、") || "-";
+}
+function bindRowChecks(sel, store, syncAll){
+  $$(sel+" td.chk").forEach(td=>td.onclick=e=>e.stopPropagation());
+  $$(sel+" .row-chk").forEach(b=>b.onchange=e=>{
+    e.stopPropagation();
+    if (b.checked) store.add(b.dataset.id); else store.delete(b.dataset.id);
+    syncAll();
+  });
+  syncAll();
+}
+function syncNamedCheckAll(boxSel, allId, store){
+  const boxes=$$(boxSel);
+  const all=$(allId);
+  if (!all) return;
+  if (!boxes.length){ all.checked=false; all.indeterminate=false; return; }
+  const n=boxes.filter(b=>b.checked).length;
+  all.checked=n===boxes.length;
+  all.indeterminate=n>0 && n<boxes.length;
+}
+function toggleNamedCheckAll(boxSel, allId, store){
+  const on=$(allId).checked;
+  $$(boxSel).forEach(b=>{
+    b.checked=on;
+    if (on) store.add(b.dataset.id); else store.delete(b.dataset.id);
+  });
+  $(allId).indeterminate=false;
+}
+function renderBL(){
+  const company=isCompany();
+  $$("#blTabs .tab-inner").forEach(b=>b.classList.toggle("active", b.dataset.bl===blTab));
+  $("#blPersonBox").style.display = blTab==="p"?"block":"none";
+  $("#blSubBox").style.display = blTab==="s"?"block":"none";
+  $("#blPersonHint").textContent=company
+    ? "低于清退线、二次停工培训、培训超时等按规则自动列入，也可直接判定列入。无审核流转，不报送集团。公司侧展示所属项目。"
+    : "低于清退线、二次停工培训、培训超时等按规则自动列入，也可直接判定列入。无审核流转，不报送集团。仅本项目人员。";
+  $("#blSubHint").textContent=company
+    ? "第十四条情形或累计分过低等规则直接列入，无审批节点。公司侧展示分包商所属项目。"
+    : "第十四条情形或累计分过低等规则直接列入，无审批节点。仅本项目分包商。";
+  const jobs=[...new Set(activePersonBL().map(blPersonJobOf).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"zh"));
+  const ruleset=[...new Set(activeSubBL().map(x=>x.rule).filter(Boolean))];
+  blpJob=fillNamedSelect($("#blpJob"), blpJob, "全部工种", jobs);
+  blsRule=fillNamedSelect($("#blsRule"), blsRule, "全部列入规则", ruleset);
+  $("#blpProj").classList.toggle("is-hide", !company);
+  $("#blsProj").classList.toggle("is-hide", !company);
+  if (company){
+    fillProjectSelect($("#blpProj"), blpProj, true);
+    fillProjectSelect($("#blsProj"), blsProj, true);
+    blpProj=$("#blpProj").value||"all";
+    blsProj=$("#blsProj").value||"all";
+  }
+  const btnSub=$("#btnSubBL");
+  if (btnSub){ btnSub.style.display=can("art14")?"":"none"; btnSub.onclick=startSubBL; }
+  const pCols=company?10:9;
+  $("#blpHead").innerHTML=company
+    ? `<tr><th class="chk"><input type="checkbox" id="blpCheckAll" title="全选当前列表" /></th><th>人员</th><th>所属项目</th><th>工种 / 班组</th><th>所属劳务公司</th><th>当前分</th><th>列入规则</th><th>原因</th><th>列入时间</th><th>操作</th></tr>`
+    : `<tr><th class="chk"><input type="checkbox" id="blpCheckAll" title="全选当前列表" /></th><th>人员</th><th>工种 / 班组</th><th>所属劳务公司</th><th>当前分</th><th>列入规则</th><th>原因</th><th>列入时间</th><th>操作</th></tr>`;
+  const pRows=filteredPersonBL();
+  $("#blpTbody").innerHTML = pRows.map(x=>{
+    const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+    const score=p?p.score:x.scoreAt;
+    const job=`${x.job||(p&&p.job)||"-"} / ${x.team||(p&&p.team)||"-"}`;
+    const rm=can("blRemove")?`<button class="btn-danger-text" data-rm="${x.pid||x.id}">移出</button>`:"";
+    const cells=company
+      ? `<td>${x.name}</td><td>${x.project||(p&&p.project)||"-"}</td><td>${job}</td><td>${subName(x.sub||(p&&p.sub))}</td>`
+      : `<td>${x.name}</td><td>${job}</td><td>${subName(x.sub||(p&&p.sub))}</td>`;
+    return `<tr class="clickable" data-pid="${p?p.id:""}"><td class="chk"><input type="checkbox" class="row-chk" data-id="${x.id}" ${blPersonSel.has(x.id)?"checked":""} /></td>${cells}<td style="font-family:var(--num-font);font-weight:700">${score}</td><td>${x.rule||"-"}</td><td class="cell-reason">${x.reason||x.src||"-"}</td><td>${x.time}</td><td class="act-cell"><button class="btn-link" data-flow="${p?p.id:""}">积分流水</button> ${rm}</td></tr>`;
+  }).join("") || `<tr><td colspan="${pCols}" class="muted">${pRows.length||(!blpQ&&blpJob==="all"&&(!company||blpProj==="all"))?"暂无人员黑名单":"无匹配人员"}</td></tr>`;
+  const sCols=company?9:8;
+  $("#blsHead").innerHTML=company
+    ? `<tr><th class="chk"><input type="checkbox" id="blsCheckAll" title="全选当前列表" /></th><th>分包商</th><th>所属项目</th><th>现场负责人</th><th>当前分</th><th>列入规则</th><th>原因</th><th>列入时间</th><th>操作</th></tr>`
+    : `<tr><th class="chk"><input type="checkbox" id="blsCheckAll" title="全选当前列表" /></th><th>分包商</th><th>现场负责人</th><th>本项目分</th><th>列入规则</th><th>原因</th><th>列入时间</th><th>操作</th></tr>`;
+  const sRows=filteredSubBL();
+  $("#blsTbody").innerHTML = sRows.map(x=>{
+    const s=subs.find(ss=>ss.id===x.sid);
+    if (!s) return "";
+    const rm=can("blRemove")?`<button class="btn-danger-text" data-rms="${s.id}">移出</button>`:"";
+    const score=company?s.score:(s.projects&&s.projects[CURRENT_PROJECT]!=null?s.projects[CURRENT_PROJECT]:s.score);
+    const cells=company
+      ? `<td>${s.name}</td><td>${subProjText(s)}</td><td>${s.lead}</td>`
+      : `<td>${s.name}</td><td>${s.lead}</td>`;
+    return `<tr class="clickable" data-sid="${s.id}"><td class="chk"><input type="checkbox" class="row-chk" data-id="${x.id}" ${blSubSel.has(x.id)?"checked":""} /></td>${cells}<td style="font-family:var(--num-font);font-weight:700">${score}</td><td>${x.rule||"-"}</td><td class="cell-reason">${x.reason||"-"}</td><td>${x.time}</td><td class="act-cell"><button class="btn-link" data-sflow="${s.id}">积分流水</button> ${rm}</td></tr>`;
+  }).join("") || `<tr><td colspan="${sCols}" class="muted">${sRows.length||(!blsQ&&blsRule==="all"&&(!company||blsProj==="all"))?"暂无分包商黑名单":"无匹配分包商"}</td></tr>`;
+  $$("#blpTbody tr.clickable").forEach(tr=>tr.onclick=()=>{ if(tr.dataset.pid) openBLPerson(tr.dataset.pid); });
+  $$("#blsTbody tr.clickable").forEach(tr=>tr.onclick=()=>{ if(tr.dataset.sid) openBLSub(tr.dataset.sid); });
+  $$("#blpTbody [data-flow]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openBLPerson(b.dataset.flow); });
+  $$("#blpTbody [data-rm]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); confirmRemovePersonBL(b.dataset.rm); });
+  $$("#blsTbody [data-sflow]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); openBLSub(b.dataset.sflow); });
+  $$("#blsTbody [data-rms]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); confirmRemoveSubBL(b.dataset.rms); });
+  bindRowChecks("#blpTbody", blPersonSel, ()=>syncNamedCheckAll("#blpTbody .row-chk", "#blpCheckAll"));
+  bindRowChecks("#blsTbody", blSubSel, ()=>syncNamedCheckAll("#blsTbody .row-chk", "#blsCheckAll"));
+  const blpAll=$("#blpCheckAll"); if(blpAll) blpAll.onchange=()=>toggleNamedCheckAll("#blpTbody .row-chk", "#blpCheckAll", blPersonSel);
+  const blsAll=$("#blsCheckAll"); if(blsAll) blsAll.onchange=()=>toggleNamedCheckAll("#blsTbody .row-chk", "#blsCheckAll", blSubSel);
+}
+function selectedPersonBL(){
+  return activePersonBL().filter(x=>blPersonSel.has(x.id));
+}
+function selectedSubBL(){
+  return activeSubBL().filter(x=>blSubSel.has(x.id));
+}
+function exportPersonBLLedger(){
+  const rows=selectedPersonBL();
+  if (!rows.length){ toast("请先勾选人员，或点击表头全选当前列表"); return; }
+  const listHead=["姓名","工种","班组","分包商","所属项目","当前分","列入时分","状态","列入规则","列入时间"];
+  const listBody=rows.map(x=>{
+    const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+    const st=p?pStatus(p)[0]:"清退/黑名单";
+    const score=p?p.score:(x.scoreAt!=null?x.scoreAt:"");
+    return xlsRow([
+      xlsCell(x.name), xlsCell(x.job||(p&&p.job)||"-"), xlsCell(x.team||(p&&p.team)||"-"), xlsCell(subName(x.sub||(p&&p.sub))),
+      xlsCell(x.project||(p&&p.project)||CURRENT_PROJECT), xlsCell(score,"Number"), xlsCell(x.scoreAt!=null?x.scoreAt:"-"),
+      xlsCell(st), xlsCell(x.rule||"-"), xlsCell(x.time||"-")
+    ]);
+  });
+  const detailHead=["姓名","工种","班组","分包商","所属项目","当前分","流水日期","流水类型","积分明细"];
+  const detailBody=[];
+  rows.forEach(x=>{
+    const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+    const base=[x.name, x.job||(p&&p.job)||"-", x.team||(p&&p.team)||"-", subName(x.sub||(p&&p.sub)), x.project||(p&&p.project)||CURRENT_PROJECT, p?p.score:(x.scoreAt||0)];
+    const logs=p?(p.logs||[]).slice().sort((a,b)=>(b.t||"").localeCompare(a.t||"")):[];
+    if (!logs.length){
+      detailBody.push(xlsRow(base.concat(["-","-","暂无积分流水"]).map((v,i)=>xlsCell(v, i===5?"Number":"String"))));
+      return;
+    }
+    logs.forEach(l=>{
+      detailBody.push(xlsRow([
+        xlsCell(base[0]), xlsCell(base[1]), xlsCell(base[2]), xlsCell(base[3]), xlsCell(base[4]),
+        xlsCell(base[5],"Number"), xlsCell(l.t||"-"), xlsCell(logKind(l.d)), xlsCell(l.d||"-")
+      ]));
+    });
+  });
+  const reasonHead=["姓名","工种","班组","分包商","所属项目","当前分","列入时分","列入规则","列入原因","列入时间","作用范围"];
+  const reasonBody=rows.map(x=>{
+    const p=people.find(pp=>pp.id===x.pid || pp.name===x.name);
+    return xlsRow([
+      xlsCell(x.name), xlsCell(x.job||(p&&p.job)||"-"), xlsCell(x.team||(p&&p.team)||"-"), xlsCell(subName(x.sub||(p&&p.sub))),
+      xlsCell(x.project||(p&&p.project)||CURRENT_PROJECT), xlsCell(p?p.score:(x.scoreAt||0),"Number"), xlsCell(x.scoreAt!=null?x.scoreAt:"-"),
+      xlsCell(x.rule||"-"), xlsCell(x.reason||x.src||"-"), xlsCell(x.time||"-"), xlsCell(x.scope||"本工程公司范围")
+    ]);
+  });
+  downloadXls(`人员黑名单台账-${today().replace(/-/g,"")}.xls`, [
+    xlsSheet("积分列表", listHead, listBody),
+    xlsSheet("积分明细", detailHead, detailBody),
+    xlsSheet("列入原因", reasonHead, reasonBody)
+  ], `已导出 ${rows.length} 人的黑名单台账`);
+}
+function exportSubBLLedger(){
+  const rows=selectedSubBL();
+  if (!rows.length){ toast("请先勾选分包商，或点击表头全选当前列表"); return; }
+  const listHead=["分包商","现场负责人","所属项目","当前分","列入时分","状态","列入规则","列入时间"];
+  const listBody=rows.map(x=>{
+    const s=subs.find(ss=>ss.id===x.sid);
+    const st=s?sStatus(s)[0]:"黑名单";
+    const score=s?s.score:(x.scoreAt||0);
+    return xlsRow([
+      xlsCell(s?s.name:"-"), xlsCell(s?s.lead:"-"), xlsCell(s?subProjText(s):"-"),
+      xlsCell(score,"Number"), xlsCell(x.scoreAt!=null?x.scoreAt:"-"), xlsCell(st), xlsCell(x.rule||"-"), xlsCell(x.time||"-")
+    ]);
+  });
+  const detailHead=["分包商","现场负责人","所属项目","当前分","流水日期","流水类型","积分明细","关联人员","联动扣分"];
+  const detailBody=[];
+  rows.forEach(x=>{
+    const s=subs.find(ss=>ss.id===x.sid);
+    if (!s){
+      detailBody.push(xlsRow(["-","-","-","","-","-","暂无积分流水","-",""].map((v,i)=>xlsCell(v, i===3||i===8?"Number":"String"))));
+      return;
+    }
+    const events=[];
+    (s.logs||[]).forEach(l=>{
+      if (/^人员联动/.test(l.d||"") && (s.links||[]).length) return;
+      events.push({t:l.t||"", kind:logKind(l.d), d:l.d||"-", name:"", score:""});
+    });
+    (s.links||[]).forEach(r=>events.push({t:r.t||"", kind:"人员联动", d:`${r.kind||""} · ${r.reason||""}`.replace(/^ · /,"")||"人员联动", name:r.name||"", score:r.score}));
+    events.sort((a,b)=>(b.t||"").localeCompare(a.t||""));
+    if (!events.length){
+      detailBody.push(xlsRow([s.name,s.lead,subProjText(s),s.score,"-","-","暂无积分流水","-",""].map((v,i)=>xlsCell(v, i===3||i===8?"Number":"String"))));
+      return;
+    }
+    events.forEach(e=>{
+      detailBody.push(xlsRow([
+        xlsCell(s.name), xlsCell(s.lead), xlsCell(subProjText(s)), xlsCell(s.score,"Number"),
+        xlsCell(e.t||"-"), xlsCell(e.kind), xlsCell(e.d), xlsCell(e.name||"-"),
+        e.score===""||e.score==null?xlsCell("-"):xlsCell(e.score,"Number")
+      ]));
+    });
+  });
+  const reasonHead=["分包商","现场负责人","所属项目","当前分","列入时分","列入规则","对应条款","列入原因","列入时间"];
+  const reasonBody=rows.map(x=>{
+    const s=subs.find(ss=>ss.id===x.sid);
+    const clause=x.clause?(clauseBy(x.clause)||{}).name||x.clause:"-";
+    return xlsRow([
+      xlsCell(s?s.name:"-"), xlsCell(s?s.lead:"-"), xlsCell(s?subProjText(s):"-"),
+      xlsCell(s?s.score:(x.scoreAt||0),"Number"), xlsCell(x.scoreAt!=null?x.scoreAt:"-"),
+      xlsCell(x.rule||"-"), xlsCell(clause), xlsCell(x.reason||"-"), xlsCell(x.time||"-")
+    ]);
+  });
+  downloadXls(`分包商黑名单台账-${today().replace(/-/g,"")}.xls`, [
+    xlsSheet("积分列表", listHead, listBody),
+    xlsSheet("积分明细", detailHead, detailBody),
+    xlsSheet("列入原因", reasonHead, reasonBody)
+  ], `已导出 ${rows.length} 家分包商黑名单台账`);
+}
+function openBLPerson(pid){
+  const p=people.find(x=>x.id===pid); if(!p) return;
+  const rec=personBL.find(x=>!x.removed && (x.pid===p.id || x.name===p.name))||{};
+  const [st,cls]=pStatus(p);
+  const rm=can("blRemove")?`<button class="btn-danger-text" id="blRemove">移出黑名单</button>`:"";
+  showModal(p.name+" · 人员黑名单", `<p>所属项目 ${p.project||CURRENT_PROJECT}　${subName(p.sub)}　${p.job} / ${p.team||"-"}</p>
+    <p>当前分 <b style="font-size:22px;font-family:var(--num-font)">${p.score}</b>　列入时 ${rec.scoreAt!=null?rec.scoreAt:"-"}　${stHtml(st,cls)}</p>
+    <p>列入规则：<b>${rec.rule||"-"}</b></p>
+    <p class="hint">${rec.reason||"按积分或直接判定规则列入，无审核流转。"}</p>
+    <div class="card-title" style="margin:12px 0 8px">积分流水</div>
+    ${scoreLogsHtml(p,12)}`,
+    `<button class="btn btn-default" id="mCancel">关闭</button>${rm}`, true);
+  $("#mCancel").onclick=closeMask;
+  const btn=$("#blRemove"); if(btn) btn.onclick=()=>{ closeMask(); confirmRemovePersonBL(p.id); };
+}
+function openBLSub(sid){
+  const s=subs.find(x=>x.id===sid); if(!s) return;
+  const rec=subBL.find(x=>!x.removed && x.sid===s.id)||{};
+  const [st,cls]=sStatus(s);
+  const rm=can("blRemove")?`<button class="btn-danger-text" id="blRemove">移出黑名单</button>`:"";
+  showModal(s.name+" · 分包商黑名单", `<p>所属项目 ${subProjText(s)}　法人 ${s.legal}　现场负责人 ${s.lead}</p>
+    <p>当前分 <b style="font-size:22px;font-family:var(--num-font)">${s.score}</b>　列入时 ${rec.scoreAt!=null?rec.scoreAt:"-"}　${stHtml(st,cls)}</p>
+    <p>列入规则：<b>${rec.rule||"-"}</b></p>
+    <p class="hint">${rec.reason||"按第十四条或累计分过低等规则直接列入，无审核流转。"}</p>
+    ${linkTableHtml(s)}
+    <div class="card-title" style="margin:16px 0 8px">账户流水</div>
+    <div class="timeline">${(s.logs||[]).map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join("")}</div>`,
+    `<button class="btn btn-default" id="mCancel">关闭</button>${rm}`, true);
+  $("#mCancel").onclick=closeMask;
+  const btn=$("#blRemove"); if(btn) btn.onclick=()=>{ closeMask(); confirmRemoveSubBL(s.id); };
+}
+function confirmRemovePersonBL(pid){
+  const p=people.find(x=>x.id===pid); if(!p) return;
+  showModal("移出人员黑名单", `<p>确认将 <b>${p.name}</b> 从人员黑名单移出？移出后不再显示黑名单标识，历史积分流水保留。</p>
+    <p class="hint">当前分 ${p.score}。不会因当前仍低于清退线而立即重新列入；再次触发清退、培训超时、二次停工培训或人工确认列入时才会再入列。</p>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="rmOk">确认移出</button>`);
+  $("#mCancel").onclick=closeMask;
+  $("#rmOk").onclick=()=>{ removePersonBL(pid); closeMask(); };
+}
+function confirmRemoveSubBL(sid){
+  const s=subs.find(x=>x.id===sid); if(!s) return;
+  showModal("移出分包商黑名单", `<p>确认将 <b>${s.name}</b> 从分包商黑名单移出？移出后状态恢复为正常，历史流水保留。</p>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="rmOk">确认移出</button>`);
+  $("#mCancel").onclick=closeMask;
+  $("#rmOk").onclick=()=>{ removeSubBL(sid); closeMask(); };
+}
+function removePersonBL(pid){
+  if (!can("blRemove")) { toast("当前角色不能移出黑名单"); return; }
+  const p=people.find(x=>x.id===pid);
+  personBL.filter(x=>!x.removed && (x.pid===pid || (p && x.name===p.name))).forEach(x=>{ x.removed=true; x.outAt=today(); });
+  if (p){ p.logs.unshift({t:today(), d:"已从人员黑名单移出。"}); p.last="已移出黑名单"; }
+  toast((p?p.name:pid)+" 已移出人员黑名单");
+  render();
+}
+function removeSubBL(sid){
+  if (!can("blRemove")) { toast("当前角色不能移出黑名单"); return; }
+  const s=subs.find(x=>x.id===sid);
+  subBL.filter(x=>!x.removed && x.sid===sid).forEach(x=>{ x.removed=true; x.outAt=today(); });
+  if (s){ s.status="正常"; s.logs.unshift({t:today(), d:"已从劳务分包商黑名单移出。"}); }
+  toast((s?s.name:sid)+" 已移出分包商黑名单");
+  render();
+}
+function showModal(title, body, foot, wide){
+  $("#modalTitle").textContent=title; $("#modalBody").innerHTML=body; $("#modalFoot").innerHTML=foot||"";
+  $("#modalFoot").classList.toggle("is-hide", !foot);
+  $("#modalBox").classList.toggle("wide", !!wide); openMask();
+}
+function openPerson(id){
+  const p=people.find(x=>x.id===id); if(!p) return;
+  const [st,cls]=pStatus(p);
+  showModal(p.name+" · 积分档案", `<p>项目：${p.project||CURRENT_PROJECT}　分包商：${subName(p.sub)}　工种：${p.job}　班组：${p.team||"-"}　进场：${p.inAt}</p>
+    <p>当前分 <b style="font-size:22px;font-family:var(--num-font)">${p.score}</b>　${stHtml(st,cls)}</p>
+    <p class="hint">计分自进场累计至退场。每月 ${rules.snapDay} 日读取当时累计分。</p>
+    <div class="timeline">${p.logs.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join("")}</div>`,
+    `<button class="btn btn-default" id="mCancel">关闭</button>${can("deduct")?`<button class="btn btn-primary" id="dDeduct">对本人员记分</button>`:""}`);
+  $("#mCancel").onclick=closeMask;
+  const btn=$("#dDeduct"); if(btn) btn.onclick=()=>{ closeMask(); startDeduct(id); };
+}
+function linksAsOf(s, at){
+  return (s.links||[]).filter(r=>!at || (r.t||"")<=at).slice().sort((a,b)=>(b.t||"").localeCompare(a.t||""));
+}
+function subLinkTotal(s, at){
+  const rows=linksAsOf(s, at);
+  if (rows.length) return +(rows.reduce((n,r)=>n+(+r.score||0),0).toFixed(1));
+  if (at) return 0;
+  return +(s.link||0).toFixed(1);
+}
+function addPersonLink(sub, p, kind, reason, score, t){
+  if (!sub || sub.frozen || !score) return;
+  const at=t||today();
+  if (!sub.links) sub.links=[];
+  sub.links.unshift({t:at, name:p.name, job:p.job, team:p.team||"-", project:p.project||CURRENT_PROJECT, kind, reason, score});
+  sub.link=subLinkTotal(sub);
+  sub.score=+(Math.max(0, sub.score-score).toFixed(1));
+  sub.logs.unshift({t:at, d:`人员联动：${p.name}因${reason}（${kind}），扣 ${score} 分`});
+}
+function linkTableHtml(s, asOf){
+  const rows=linksAsOf(s, asOf);
+  const total=+(rows.reduce((n,r)=>n+(+r.score||0),0).toFixed(1));
+  if (!rows.length) return asOf
+    ? `<p class="hint">截至 ${asOf} 暂无人员联动扣分。</p>`
+    : `<p class="hint">暂无人员联动扣分。</p>`;
+  const title=asOf
+    ? `人员联动扣分明细　截至 ${asOf} 已扣 ${total.toFixed(1)} 分`
+    : `人员联动扣分明细　已扣 ${total.toFixed(1)} 分`;
+  return `<div class="card-title" style="margin:12px 0 8px">${title}</div>
+    <p class="muted" style="margin-bottom:8px">标准：黑名单 ${rules.linkBl}/人，停工培训单 ${rules.linkTrain}/人，违规记分 ${rules.linkVio}/人。下表列出具体人员及原因。</p>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>日期</th><th>人员</th><th>工种 / 班组</th><th>所属项目</th><th>原因</th><th>扣分</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${r.t}</td><td>${r.name}</td><td>${r.job} / ${r.team||"-"}</td><td>${r.project||"-"}</td><td>${r.kind} · ${r.reason}</td><td style="font-family:var(--num-font);font-weight:700">-${r.score}</td></tr>`).join("")}
+        <tr><td colspan="5" style="text-align:right;font-weight:500">合计</td><td style="font-family:var(--num-font);font-weight:700">-${total.toFixed(1)}</td></tr>
+      </tbody></table></div>`;
+}
+function openSub(id){
+  const s=subs.find(x=>x.id===id); if(!s) return;
+  const other=(s.logs||[]).filter(l=>!/^人员联动/.test(l.d||""));
+  showModal(s.name+" · 台账", `<p>法人 ${s.legal}　现场负责人 ${s.lead}　本项目分 <b>${s.score}</b></p>
+    ${linkTableHtml(s)}
+    <div class="card-title" style="margin:16px 0 8px">账户流水</div>
+    <div class="timeline">${other.map(l=>`<div class="tl"><time>${l.t}</time>${l.d}</div>`).join("") || `<p class="muted">暂无其他流水。</p>`}</div>`,
+    `<button class="btn btn-default" id="mCancel">关闭</button>${can("eval")?`<button class="btn btn-primary" id="dEval">人工评价</button>`:""}`, true);
+  $("#mCancel").onclick=closeMask;
+  const btn=$("#dEval"); if(btn) btn.onclick=()=>{ closeMask(); startEval(id); };
+}
+function startDeduct(pid){
+  if (!can("deduct")) { toast("当前角色不能记分"); return; }
+  const pOpts=people.filter(p=>!p.frozen).map(p=>`<option value="${p.id}" ${p.id===pid?"selected":""}>${p.name}（${p.score}分）</option>`).join("");
+  const cOpts=clauses.filter(c=>c.obj==="p"&&c.on).map(c=>`<option value="${c.id}">${c.name}（${c.score}分）</option>`).join("");
+  showModal("作业人员违章记分", `<div class="form-row"><div class="form-label">人员</div><div class="form-control"><select class="select-box" id="dPerson" style="width:100%">${pOpts}</select></div></div>
+    <div class="form-row"><div class="form-label">违章条款</div><div class="form-control"><select class="select-box" id="dClause" style="width:100%">${cOpts}</select></div></div>
+    <div class="form-row"><div class="form-label">事实描述</div><div class="form-control"><textarea class="textarea" id="dFact">现场检查发现该行为，已取证。</textarea></div></div>
+    <div class="preview" id="dPrev"></div>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="dOk">确认记分</button>`);
+  const upd=()=>{
+    const p=people.find(x=>x.id===$("#dPerson").value); const c=clauseBy($("#dClause").value); const next=Math.max(0,p.score-c.score);
+    let extra=c.score===0?"E 类仅警告责令整改，分数不变。":"记分后 "+next+" 分。";
+    if(c.score>0){ if(next<rules.out) extra+="将触发清退。"; else if(next<rules.train) extra+="将下发停工培训。"; else if(next<rules.warn) extra+="将进入重点管控。"; }
+    $("#dPrev").textContent=extra;
+  };
+  $("#dPerson").onchange=$("#dClause").onchange=upd; upd();
+  $("#mCancel").onclick=closeMask;
+  $("#dOk").onclick=()=>{ applyPersonDeduct($("#dPerson").value, clauseBy($("#dClause").value), $("#dFact").value); closeMask(); render(); };
+}
+function applyPersonDeduct(pid, c, fact){
+  const p=people.find(x=>x.id===pid); const before=p.score;
+  if (c.score>0) p.score=Math.max(0,p.score-c.score);
+  p.last=c.id+" "+(c.score?("-"+c.score):"警告");
+  p.logs.unshift({t:today(), d:c.name+(c.score?("，扣 "+c.score+" 分。"):"，警告不扣分。")+fact});
+  const sub=subs.find(s=>s.id===p.sub);
+  if (c.score>0) addPersonLink(sub, p, "违规记分", (c.name||"违章").replace(/^.*·\s*/,""), rules.linkVio);
+  maybePersonThreshold(p, before); toast("已记分："+p.name);
+}
+function maybePersonThreshold(p, before){
+  if (p.score<rules.out && before>=rules.out) tasks.unshift({id:"t"+Date.now(), pid:p.id, type:"out", due:"-", status:"待清退"});
+  else if (p.score<rules.train && before>=rules.train){
+    p.trainCount=(p.trainCount||0)+1;
+    tasks.unshift({id:"t"+Date.now(), pid:p.id, type:"train", due:plusDays(rules.days), status:"停工培训", notices:0});
+    const sub=subs.find(s=>s.id===p.sub);
+    addPersonLink(sub, p, "停工培训单", "累计分低于停工培训线，下发停工培训通知书", rules.linkTrain);
+  } else if (p.score>=rules.learn && p.score<rules.warn && before>=rules.warn){
+    tasks.unshift({id:"t"+Date.now(), pid:p.id, type:"warn", due:"-", status:"已预警"});
+    if (!tasks.some(t=>t.pid===p.id && t.type==="learn" && t.status!=="已完成")) tasks.unshift({id:"t"+Date.now(), pid:p.id, type:"learn", due:plusDays(3), status:"进行中"});
+  } else if (p.score<rules.warn && before>=rules.warn) tasks.unshift({id:"t"+Date.now(), pid:p.id, type:"warn", due:"-", status:"已预警"});
+  autoEnrollPersonBL(p);
+}
+function autoEnrollPersonBL(p){
+  const hit=personBLHit(p);
+  if (!hit) return;
+  if (personBL.some(x=>x.pid===p.id || x.name===p.name)) return;
+  enrollPersonBL(p, hit.rule, hit.reason, true);
+}
+function enrollPersonBL(p, rule, reason, withLink){
+  const rec=personBL.find(x=>x.pid===p.id || x.name===p.name);
+  if (rec && !rec.removed) return false;
+  if (rec && rec.removed){
+    rec.removed=false; rec.time=today(); rec.rule=rule; rec.reason=reason; rec.scoreAt=p.score; rec.outAt="";
+  } else {
+    personBL.unshift({id:"pb"+Date.now(), pid:p.id, name:p.name, job:p.job, team:p.team||"-", project:p.project||CURRENT_PROJECT, sub:p.sub, rule, reason, time:today(), scoreAt:p.score, scope:"本工程公司范围", removed:false});
+    if (withLink){
+      const sub=subs.find(s=>s.id===p.sub);
+      addPersonLink(sub, p, "进入黑名单", reason, rules.linkBl);
+    }
+  }
+  p.logs.unshift({t:today(), d:`按规则列入人员黑名单：${rule}。${reason}`});
+  p.last="已列入黑名单";
+  return true;
+}
+function remindPerson(pid){
+  if (!can("train")) { toast("当前角色不能发送提醒"); return; }
+  const p=people.find(x=>x.id===pid); if(!p) return;
+  const [st,cls]=pStatus(p);
+  showModal("重点管控提醒", `<p>${p.name}　${p.job}　${subName(p.sub)}　当前分 <b style="font-family:var(--num-font)">${p.score}</b>　${stHtml(st,cls)}</p>
+    <p class="hint">低于 ${rules.warn} 分已进入重点管控。推送后请本人关注积分扣分，避免降至停工培训线。</p>
+    <div class="card-title" style="margin:12px 0 8px">积分扣分情况</div>
+    ${scoreLogsHtml(p,5)}
+    <div class="preview">确认后将向该人员推送：您当前安全积分为 ${p.score} 分，已列入重点管控，请立即关注扣分记录并落实整改。</div>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="remindOk">推送提醒</button>`);
+  $("#mCancel").onclick=closeMask;
+  $("#remindOk").onclick=()=>{
+    p.logs.unshift({t:today(), d:"已向人员推送重点管控提醒：当前分 "+p.score+"，请关注积分扣分情况。"});
+    p.last="已提醒";
+    closeMask(); toast("已提醒 "+p.name+" 关注积分扣分情况"); render();
+  };
+}
+function noticeFromWorker(pid){
+  let t=tasks.find(x=>x.pid===pid && x.type==="train" && x.status!=="已完成" && x.status!=="超时");
+  if (!t){
+    t={id:"t"+Date.now(), pid, type:"train", due:plusDays(rules.days), status:"停工培训", notices:0};
+    tasks.unshift(t);
+  }
+  showNotice(t.id);
+}
+function showNotice(id){
+  const t=tasks.find(x=>x.id===id); const p=people.find(x=>x.id===t.pid); t.notices=(t.notices||0)+1;
+  showModal("停工培训通知书", `<div class="doc"><h4>停工培训通知书（默认模板）</h4>
+    <table class="data-table"><tr><td>项目</td><td>雄忻高铁接触网工程 3 标</td><td>人员</td><td>${p.name}</td></tr>
+    <tr><td>所属分包商</td><td>${subName(p.sub)}</td><td>工种</td><td>${p.job}</td></tr>
+    <tr><td>当前分</td><td>${p.score}</td><td>累计培训通知</td><td>第 ${t.notices} 次</td></tr>
+    <tr><td>培训要求</td><td colspan="3">立即停工，参加再教育再培训，期限 ${t.due} 前完成考核。合格后方可复岗。</td></tr>
+    <tr><td>签发人</td><td>项目安全总监</td><td>签收人</td><td>待签收</td></tr></table>
+    <p class="hint">客户尚未提供样式，本期用系统默认模板。导出后同步推送人员。</p></div>
+    <div class="card-title" style="margin:12px 0 8px">积分扣分情况（随通知书推送）</div>
+    ${scoreLogsHtml(p,5)}
+    <div class="preview">确认后导出通知书，并将通知书内容及上述扣分情况推送给 ${p.name} 签收关注。</div>`,
+    `<button class="btn btn-default" id="mCancel">关闭</button><button class="btn btn-primary" id="sendNote">导出并推送人员</button>`, true);
+  $("#mCancel").onclick=closeMask;
+  $("#sendNote").onclick=()=>{
+    p.logs.unshift({t:today(), d:"已下发停工培训通知书并推送人员：当前分 "+p.score+"，期限 "+t.due+"。"});
+    p.last="通知书已推送";
+    if (t.notices>=2 && p.score>=rules.out){ tasks.unshift({id:"t"+Date.now(), pid:p.id, type:"out", due:"-", status:"待清退"}); toast("通知书已导出并推送。累计 2 次停工培训通知书，已生成清退任务"); }
+    else toast("通知书已导出，内容及扣分情况已推送给 "+p.name);
+    closeMask(); render();
+  };
+}
+function startPersonBL(pid){
+  if (!can("train")) { toast("当前角色不能列入人员黑名单"); return; }
+  const p=people.find(x=>x.id===pid); if(!p) return;
+  if (inPersonBL(p)){ openBLPerson(p.id); return; }
+  const hit=personBLHit(p)||{rule:"直接判定列入", reason:"项目按清退/黑名单规则直接判定列入"};
+  showModal("列入人员黑名单", `<p>${p.name}　${p.job}　${subName(p.sub)}　项目 ${p.project||CURRENT_PROJECT}　当前分 <b style="font-family:var(--num-font)">${p.score}</b></p>
+    <p>列入规则：<b>${hit.rule}</b></p>
+    <p class="hint">${hit.reason}。确认后立即列入本工程公司人员黑名单，无审核流转。</p>
+    <div class="card-title" style="margin:12px 0 8px">积分流水</div>
+    ${scoreLogsHtml(p,8)}`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="blOk">确认列入</button>`, true);
+  $("#mCancel").onclick=closeMask;
+  $("#blOk").onclick=()=>{ closeMask(); addPersonBL(pid, hit.rule); };
+}
+function addPersonBL(pid, src){
+  const p=people.find(x=>x.id===pid); if(!p) return;
+  if (inPersonBL(p)){ toast(p.name+" 已在人员黑名单"); render(); return; }
+  const hit=personBLHit(p)||{rule:src||"直接判定列入", reason:src||"按规则直接列入人员黑名单"};
+  const first=!personBL.some(x=>x.pid===p.id || x.name===p.name);
+  enrollPersonBL(p, hit.rule, hit.reason, first);
+  toast(p.name+" 已列入人员黑名单");
+  render();
+}
+function startEval(sid){
+  if (!can("eval")) { toast("人工评价由项目领导小组审定"); return; }
+  const sOpts=subs.filter(s=>!s.frozen).map(s=>`<option value="${s.id}" ${s.id===sid?"selected":""}>${s.name}（${s.score}）</option>`).join("");
+  const cOpts=clauses.filter(c=>(c.obj==="s"||c.obj==="card")&&c.on).map(c=>`<option value="${c.id}">${c.name}（${c.score}分）</option>`).join("");
+  showModal("分包商人工评价", `<div class="form-row"><div class="form-label">分包商</div><div class="form-control"><select class="select-box" id="eSub" style="width:100%">${sOpts}</select></div></div>
+    <div class="form-row"><div class="form-label">条款</div><div class="form-control"><select class="select-box" id="eClause" style="width:100%">${cOpts}</select></div></div>
+    <div class="form-row"><div class="form-label">基本事实</div><div class="form-control"><textarea class="textarea" id="eFact">现场核查属实。</textarea></div></div>
+    <div class="preview" id="ePrev"></div><p class="hint">第十五条 / 十六条与牌标准可并行扣分。</p>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="eOk">扣分并导出记录单</button>`);
+  const upd=()=>{ const s=subs.find(x=>x.id===$("#eSub").value); const c=clauseBy($("#eClause").value); const next=Math.max(0,+(s.score-c.score).toFixed(1)); $("#ePrev").textContent="扣分后 "+next+" 分。分包商状态仅正常 / 黑名单，不因分数自动变更。"; };
+  $("#eSub").onchange=$("#eClause").onchange=upd; upd(); $("#mCancel").onclick=closeMask;
+  $("#eOk").onclick=()=>{ const s=subs.find(x=>x.id===$("#eSub").value); const c=clauseBy($("#eClause").value); s.score=Math.max(0,+(s.score-c.score).toFixed(1)); s.logs.unshift({t:today(), d:c.name+"，扣 "+c.score+" 分"}); showDoc(s,c,$("#eFact").value); };
+}
+function showDoc(s,c,fact){
+  showModal("安全不良行为记录单 · 附件1", `<div class="doc"><h4>安全不良行为记录单</h4>
+    <table class="data-table"><tr><td>项目名称</td><td>雄忻高铁接触网工程 3 标</td><td>劳务分包单位</td><td>${s.name}</td></tr>
+    <tr><td>企业法人</td><td>${s.legal}</td><td>现场负责人</td><td>${s.lead}</td></tr>
+    <tr><td>认定依据</td><td colspan="3">${c.name}</td></tr>
+    <tr><td>基本事实</td><td colspan="3">${fact}</td></tr>
+    <tr><td>处理结果</td><td colspan="3">扣 ${c.score} 分，当前分 ${s.score}。签收状态：待签收</td></tr>
+    <tr><td>检查人</td><td>项目安监</td><td>签发人</td><td>安全总监</td></tr></table>
+    <p class="hint">不使用牌体系考核通知单作为主单据。</p></div>`,
+    `<button class="btn btn-default" id="mCancel">关闭</button><button class="btn btn-primary" id="signDoc">签收并导出</button>`, true);
+  $("#mCancel").onclick=closeMask; $("#signDoc").onclick=()=>{ closeMask(); toast("记录单已签收，签收状态已回写"); render(); };
+}
+function startSubBL(){
+  if (!can("art14")) { toast("分包商黑名单由项目领导小组按规则直接列入"); return; }
+  const list=subs.filter(s=>!s.frozen && (isCompany() || !s.projects || s.projects[CURRENT_PROJECT]!=null));
+  const sOpts=list.map(s=>`<option value="${s.id}">${s.name}（${s.score}分${inSubBL(s)?" · 已在库":""}）</option>`).join("");
+  const cOpts=clauses.filter(c=>c.obj==="s14"&&c.on).map(c=>`<option value="${c.id}">${c.name}</option>`).join("")
+    + `<option value="score">累计分过低，直接列入</option>`;
+  showModal("直接列入分包商黑名单", `<div class="form-row"><div class="form-label">分包商</div><div class="form-control"><select class="select-box" id="aSub" style="width:100%">${sOpts}</select></div></div>
+    <div class="form-row"><div class="form-label">列入规则</div><div class="form-control"><select class="select-box" id="aClause" style="width:100%">${cOpts}</select></div></div>
+    <div class="form-row"><div class="form-label">事实与原因</div><div class="form-control"><textarea class="textarea" id="aFact">经核查属实，按规则直接列入劳务分包商黑名单。</textarea></div></div>
+    <p class="hint">无审核流转。第十四条不走普通扣分；累计分过低按当时分数记入原因。</p>
+    <div class="preview" id="aPrev"></div>`,
+    `<button class="btn btn-default" id="mCancel">取消</button><button class="btn btn-primary" id="aOk">确认列入</button>`);
+  const upd=()=>{
+    const s=subs.find(x=>x.id===$("#aSub").value);
+    const v=$("#aClause").value;
+    const c=clauseBy(v);
+    $("#aPrev").textContent=s?`${s.name} 当前 ${s.score} 分，所属项目 ${subProjText(s)}。${inSubBL(s)?"已在黑名单库。":(v==="score"?"将按累计分过低直接列入。":((c&&c.name)||"")+"，直接列入。")}`:"";
+  };
+  $("#aSub").onchange=$("#aClause").onchange=upd; upd();
+  $("#mCancel").onclick=closeMask;
+  $("#aOk").onclick=()=>{
+    const s=subs.find(x=>x.id===$("#aSub").value);
+    if (!s) return;
+    if (inSubBL(s)){ toast(s.name+" 已在分包商黑名单"); closeMask(); return; }
+    const v=$("#aClause").value;
+    const c=clauseBy(v);
+    const rule=v==="score"?"累计分过低":"第十四条";
+    const reason=v==="score"?`当前分 ${s.score}，${$("#aFact").value}`:((c?c.name+"。":"")+($("#aFact").value||""));
+    enrollSubBL(s, rule, v==="score"?"":v, reason);
+    closeMask(); blTab="s"; goto("blacklist");
+  };
+}
+function enrollSubBL(s, rule, clause, reason){
+  const rec=subBL.find(x=>x.sid===s.id);
+  if (rec && !rec.removed) return;
+  if (rec && rec.removed){
+    rec.removed=false; rec.time=today(); rec.rule=rule; rec.clause=clause; rec.reason=reason; rec.scoreAt=s.score; rec.outAt="";
+  } else {
+    subBL.unshift({id:"sb"+Date.now(), sid:s.id, rule, clause, reason, time:today(), scoreAt:s.score, removed:false});
+  }
+  s.status="黑名单";
+  s.logs.unshift({t:today(), d:`${rule}${clause?" · "+(clauseBy(clause)||{}).name||"":""}，直接列入劳务分包商黑名单。${reason}`});
+  toast(s.name+" 已列入分包商黑名单");
+  render();
+}
+function startArt14(){ startSubBL(); }
+
+$$(".sec-item").forEach(b=>b.onclick=()=>goto(b.dataset.page));
+$("#kpiBack").onclick=()=>goto("dashboard");
+$("#archiveBack").onclick=()=>goto("workers");
+$$("#archiveTabs .tab-inner").forEach(b=>b.onclick=()=>{ archiveTab=b.dataset.arch; renderArchive(); });
+$("#subInfoBack").onclick=()=>goto("subs");
+$$("#subInfoTabs .tab-inner").forEach(b=>b.onclick=()=>{ subInfoTab=b.dataset.subtab; renderSubInfo(); });
+$("#roleSel").onchange=()=>{
+  role=$("#roleSel").value;
+  const home="dashboard";
+  goto(home);
+  toast({project:"项目安全员：可记分、同步劳务教育停工成绩并人工确认加分",lead:"领导小组：人工评价、直接列入分包商黑名单、账户冻结与同步",company:"工程公司：公司看板跨项目汇总，查看各项目黑名单",committee:"安委会：查阅公司范围黑名单并支持移出"}[role]);
+};
+$("#workerQ").oninput=renderWorkers; $("#workerFilter").onchange=renderWorkers;
+$("#workerCheckAll").onchange=()=>{
+  const on=$("#workerCheckAll").checked;
+  $$("#workerTbody .row-chk").forEach(b=>{
+    b.checked=on;
+    if (on) workerSel.add(b.dataset.id); else workerSel.delete(b.dataset.id);
+  });
+  $("#workerCheckAll").indeterminate=false;
+};
+$("#btnExportWorkers").onclick=exportWorkerLedger;
+$("#subCheckAll").onchange=()=>toggleNamedCheckAll("#subTbody .row-chk", "#subCheckAll", subSel);
+$("#btnExportSubs").onclick=exportSubLedger;
+$("#trainFilter").onchange=renderTrainConfirm; $("#subQ").oninput=renderSubs;
+$("#btnDeduct").onclick=()=>startDeduct(people[0].id);
+$("#btnEval").onclick=()=>startEval(subs[0].id);
+$("#btnArt14").onclick=startArt14;
+$("#btnSyncSub").onclick=syncSubsFromEdu;
+$("#btnSyncPerson").onclick=syncPeopleFromEdu;
+$$("#ruleTabs .tab-inner").forEach(b=>b.onclick=()=>{ruleTab=b.dataset.tab; renderRules();});
+$$("#snapTabs .tab-inner").forEach(b=>b.onclick=()=>{snapTab=b.dataset.snap; renderMonthly();});
+$("#snapQ").oninput=()=>{ snapQ=$("#snapQ").value; renderMonthly(); };
+$("#snapJob").onchange=()=>{ snapJob=$("#snapJob").value; renderMonthly(); };
+$("#snapProj").onchange=()=>{ snapProj=$("#snapProj").value; renderMonthly(); };
+$$("#blTabs .tab-inner").forEach(b=>b.onclick=()=>{blTab=b.dataset.bl; renderBL();});
+$("#blpQ").oninput=()=>{ blpQ=$("#blpQ").value; renderBL(); };
+$("#blpJob").onchange=()=>{ blpJob=$("#blpJob").value; renderBL(); };
+$("#blpProj").onchange=()=>{ blpProj=$("#blpProj").value; renderBL(); };
+$("#blsQ").oninput=()=>{ blsQ=$("#blsQ").value; renderBL(); };
+$("#blsRule").onchange=()=>{ blsRule=$("#blsRule").value; renderBL(); };
+$("#blsProj").onchange=()=>{ blsProj=$("#blsProj").value; renderBL(); };
+$("#btnExportBlPerson").onclick=exportPersonBLLedger;
+$("#btnExportBlSub").onclick=exportSubBLLedger;
+$("#todoCount").onclick=()=>goto(isCompany()?"monthly":"training");
+$("#modalClose").onclick=closeMask;
+$("#mask").addEventListener("click", e=>{ if(e.target.id==="mask") closeMask(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeMask(); });
+render();
+</script>
+</body>
+</html>
